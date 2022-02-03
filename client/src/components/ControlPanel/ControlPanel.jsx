@@ -89,22 +89,22 @@ const ControlPanel = () => {
           </Welcome>
           <Controls>
             <button data-option='addTask' title={'Dodaj zadanie'} onClick={handleSelectOption}>
-              <FontAwesomeIcon icon={faPlusCircle}></FontAwesomeIcon>
+              <FontAwesomeIcon icon={faPlusCircle} />
               {windowWidth > 660 && <p>Dodaj zadanie</p>}
             </button>
             <button data-option='removeTask' title={'Usuń zadanie'}>
-              <FontAwesomeIcon icon={faMinusCircle}></FontAwesomeIcon>
+              <FontAwesomeIcon icon={faMinusCircle} />
               {windowWidth > 660 && <p>Usuń zadanie</p>}
             </button>
             <button data-option='editTask' title={'Edytuj zadanie'}>
-              <FontAwesomeIcon icon={faEdit}></FontAwesomeIcon>
+              <FontAwesomeIcon icon={faEdit} />
               {windowWidth > 660 && <p>Edytuj zadanie</p>}
             </button>
             <button
               data-option='clearTasksList'
               title={'Wyczyść listę'}
               onClick={handleSelectOption}>
-              <FontAwesomeIcon icon={faTrashAlt}></FontAwesomeIcon>
+              <FontAwesomeIcon icon={faTrashAlt} />
               {windowWidth > 660 && <p>Wyczyść listę</p>}
             </button>
           </Controls>
@@ -116,15 +116,14 @@ const ControlPanel = () => {
             onClick={handleToggleShowSortSelect}>
             Sortuj zadania według:
             <span>
-              <FontAwesomeIcon icon={faAngleDoubleDown}></FontAwesomeIcon>
+              <FontAwesomeIcon icon={faAngleDoubleDown} />
             </span>
           </ManageButton>
           <Sort
             defaultValue='oldest'
             name='sort'
             runFadeOutSortSelectAnimation={runFadeOutSortSelectAnimation}
-            showSortSelect={showSortSelect}
-            onChange={handleToggleShowSortSelect}>
+            showSortSelect={showSortSelect}>
             <option value='own'>Własna kolejność</option>
             <option value='oldest'>Daty dodania (od najstarszych)</option>
             <option value='newest'>Daty dodania (od najnowszych)</option>
@@ -139,15 +138,14 @@ const ControlPanel = () => {
             onClick={handleToggleShowDisplaySelect}>
             Wyświetlaj zadania:
             <span>
-              <FontAwesomeIcon icon={faAngleDoubleDown}></FontAwesomeIcon>
+              <FontAwesomeIcon icon={faAngleDoubleDown} />
             </span>
           </ManageButton>
           <Display
             defaultValue='all'
             name='display'
             runFadeOutDisplaySelectAnimation={runFadeOutDisplaySelectAnimation}
-            showDisplaySelect={showDisplaySelect}
-            onChange={handleToggleShowDisplaySelect}>
+            showDisplaySelect={showDisplaySelect}>
             <option value='all'>Wszystkie</option>
             <option value='all'>Zrobione</option>
             <option value='all'>Niezrobione</option>

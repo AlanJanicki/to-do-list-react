@@ -36,6 +36,13 @@ export const PaginationWrapper = styled.div`
       outline: 1px solid #ee7300;
     }
 
+    @media (hover: hover) {
+      &:hover {
+        color: #ee7300;
+        text-decoration: underline;
+      }
+    }
+
     @media (min-width: 1024px) {
       font-size: 1rem;
     }
@@ -46,11 +53,10 @@ export const TaskAmount = styled.div`
   margin-top: 5px;
   display: flex;
   justify-content: center;
-  column-gap: 10px;
+  column-gap: 5px;
   width: 100%;
 
   button {
-    margin-top: 5px;
     padding: 3px;
   }
 `;
@@ -58,31 +64,36 @@ export const TaskAmount = styled.div`
 export const Navigate = styled.div`
   margin-top: 5px;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
+  column-gap: 10px;
   align-items: center;
   width: 100%;
-  max-width: 380px;
 
   button {
-    border-radius: 5px;
-    max-width: 35%;
     padding: 5px;
     text-align: center;
   }
 
-  select {
+  button:nth-of-type(2),
+  button:nth-of-type(3) {
+    color: #ee7300;
+
+    @media (hover: hover) {
+      &:hover {
+        color: #944700;
+      }
+    }
+  }
+
+  input {
     width: 50px;
-    height: 25px;
+    height: 30px;
     border: none;
-    border-radius: 5px;
-    color: #fff;
-    background: #ee7300;
-    font-weight: bold;
     text-align: center;
     cursor: pointer;
 
     &:focus {
-      outline: 1px solid #000;
+      outline: 1px solid #ee7300;
     }
 
     &:focus:not(:focus-visible) {
@@ -90,7 +101,7 @@ export const Navigate = styled.div`
     }
 
     &:focus-visible {
-      outline: 1px solid #000;
+      outline: 1px solid #ee7300;
     }
   }
 `;

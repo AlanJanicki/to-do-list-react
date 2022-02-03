@@ -34,9 +34,10 @@ const Form = ({
     oldPassword: '',
     password: '',
     passwordRepeated: '',
-    taskName: '',
-    taskDate: '',
+    taskBody: '',
+    taskFinishDate: '',
     taskPriority: '',
+    uncategorizedErrors: '',
   };
   const [formData, setFormData] = useState(initFormDataState);
   const [formErrors, setFormErrors] = useState(initFormDataState);
@@ -87,6 +88,7 @@ const Form = ({
     if (formSent) {
       setFormSent(false);
     }
+    handleClearFormState([setFormData, setFormErrors, setFormWarnings]);
     lockBodyScroll(windowScrollY);
     dispatch(openModal());
   };
@@ -167,9 +169,14 @@ const Form = ({
     for (const error in formErrors) {
       if (formErrors[error].length > 0) {
         return (
-          <FormParagraph error={true}>
-            W formularzu wykryto poniższe błędy, popraw je i spróbuj ponownie!
-          </FormParagraph>
+          <>
+            <FormParagraph error={true}>
+              W formularzu wykryto poniższe błędy, popraw je i spróbuj ponownie!
+            </FormParagraph>
+            {formErrors.uncategorizedErrors && (
+              <FormParagraph error={true}>{formErrors.uncategorizedErrors}</FormParagraph>
+            )}
+          </>
         );
       }
     }
@@ -261,8 +268,8 @@ const Form = ({
           <TaskForm
             formErrors={formErrors}
             formWarnings={formWarnings}
-            taskNameValue={formData.taskName}
-            taskDateValue={formData.taskDate}
+            taskBodyValue={formData.taskBody}
+            taskFinishDateValue={formData.taskFinishDate}
             taskPriorityValue={formData.taskPriority}
             ref={modalElementToSetFocus}
             handleErrorInformation={handleErrorInformation}

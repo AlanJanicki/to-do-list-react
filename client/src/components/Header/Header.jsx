@@ -37,14 +37,14 @@ const Header = () => {
       <Search>
         <input type='text' placeholder='Szukane zadanie...' />
         <span>
-          <FontAwesomeIcon icon={faSearch}></FontAwesomeIcon>
+          <FontAwesomeIcon icon={faSearch} />
         </span>
       </Search>
       <NavMenuButton
         title={'Menu użytkownika'}
         isAccountMenuOpen={isAccountMenuOpen}
         onClick={() => dispatch(toggleAccountMenu())}>
-        <FontAwesomeIcon icon={faBars}></FontAwesomeIcon>
+        <FontAwesomeIcon icon={faBars} />
       </NavMenuButton>
     </HeaderWrapper>
   );

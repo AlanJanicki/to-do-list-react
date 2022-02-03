@@ -81,6 +81,19 @@ export const Form = styled.form`
     font-size: 1rem;
     cursor: pointer;
 
+    &:focus {
+      box-shadow: 0 0 0 2px #ee7300;
+      outline: none;
+    }
+
+    &:nth-of-type(1) {
+      background-color: #ee7300;
+    }
+
+    &:nth-of-type(2) {
+      background-color: #ffa95d;
+    }
+
     @media (min-width: 768px) {
       width: 65vw;
       font-size: 1.2rem;
@@ -91,18 +104,6 @@ export const Form = styled.form`
       margin-right: auto;
       max-width: 85%;
     }
-  }
-
-  button:focus {
-    outline: 2px solid #ee7300;
-  }
-
-  button:nth-of-type(1) {
-    background-color: #ee7300;
-  }
-
-  button:nth-of-type(2) {
-    background-color: #ffa95d;
   }
 
   @media (hover: hover) {
@@ -280,8 +281,19 @@ export const ClearTasksListFormWrapper = styled.div`
   p {
     margin: 0 auto 15px auto;
     color: red;
-    font-size: 1.1rem;
+    line-height: 1.3;
+    font-size: 1.2rem;
     font-weight: bold;
     text-align: center;
+  }
+
+  button {
+    width: 40vw;
+    max-width: 250px;
+    padding: 15px;
+
+    @media (min-width: 992px) {
+      max-width: 230px;
+    }
   }
 `;

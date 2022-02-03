@@ -7,7 +7,7 @@ const SuccessInfo = ({ children }) => {
   return (
     <SuccessInfoWrapper>
       <span>
-        <FontAwesomeIcon icon={faCheckCircle}></FontAwesomeIcon>
+        <FontAwesomeIcon icon={faCheckCircle} />
       </span>
       {children}
     </SuccessInfoWrapper>

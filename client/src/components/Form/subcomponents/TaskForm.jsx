@@ -20,8 +20,8 @@ const TaskForm = React.forwardRef(
       handleErrorInformation,
       handleUserInput,
       handleSubmitForm,
-      taskDateValue,
-      taskNameValue,
+      taskFinishDateValue,
+      taskBodyValue,
       taskPriorityValue,
       setFormKind,
     },
@@ -36,7 +36,7 @@ const TaskForm = React.forwardRef(
       const priorityStars = [];
 
       for (let i = 1; i < 4; i++) {
-        stars = [...stars, <FontAwesomeIcon key={i} icon={faStar}></FontAwesomeIcon>];
+        stars = [...stars, <FontAwesomeIcon key={i} icon={faStar} />];
 
         priorityStars.push(
           <Priority key={i} amount={i}>
@@ -57,30 +57,36 @@ const TaskForm = React.forwardRef(
     return (
       <Form onSubmit={handleSubmitForm}>
         {handleErrorInformation()}
-        {formErrors.taskName && <FormParagraph error={true}>{formErrors.taskName}</FormParagraph>}
+        {formErrors.taskBody && <FormParagraph error={true}>{formErrors.taskBody}</FormParagraph>}
         <FormTextArea
-          name='taskName'
+          name='taskBody'
           type='text'
           placeholder='Zadanie'
           required
           maxLength={100}
-          value={taskNameValue}
+          value={taskBodyValue}
           ref={ref}
           onChange={(e) => handleUserInput(e)}
         />
-        {formWarnings.taskName && (
-          <FormParagraph warning={true}>{formWarnings.taskName}</FormParagraph>
+        {formWarnings.taskBody && (
+          <FormParagraph warning={true}>{formWarnings.taskBody}</FormParagraph>
         )}
 
+        {formErrors.taskFinishDate && (
+          <FormParagraph error={true}>{formErrors.taskFinishDate}</FormParagraph>
+        )}
         <FormParagraph>Planowana data zakończenia</FormParagraph>
         <FormInput
           id='date'
-          name='taskDate'
+          name='taskFinishDate'
           type='date'
-          value={taskDateValue}
+          value={taskFinishDateValue}
           onChange={(e) => handleUserInput(e)}
         />
         <Priorities>
+          {formErrors.taskPriority && (
+            <FormParagraph error={true}>{formErrors.taskPriority}</FormParagraph>
+          )}
           <p>Priorytet zadania</p>
           <ul>{generatePriorityStars()}</ul>
         </Priorities>

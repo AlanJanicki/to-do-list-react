@@ -1,12 +1,19 @@
 import React, { useEffect } from 'react';
 
-import { Form } from '../styles/StyledForm';
+import { Form, FormParagraph } from '../styles/StyledForm';
 
 import Avatars from './Avatars';
 
 const AvatarsForm = React.forwardRef(
   (
-    { avatarValue, handleErrorInformation, handleSubmitForm, handleUserInput, setFormKind },
+    {
+      avatarValue,
+      formErrors,
+      handleErrorInformation,
+      handleSubmitForm,
+      handleUserInput,
+      setFormKind,
+    },
     ref
   ) => {
     useEffect(() => {
@@ -16,6 +23,7 @@ const AvatarsForm = React.forwardRef(
     return (
       <Form onSubmit={handleSubmitForm}>
         {handleErrorInformation()}
+        {formErrors.avatar && <FormParagraph error={true}>{formErrors.avatar}</FormParagraph>}
         <Avatars avatarValue={avatarValue} ref={ref} handleUserInput={handleUserInput} />
         <button type='submit'>Wybierz</button>
       </Form>

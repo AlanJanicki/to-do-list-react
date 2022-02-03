@@ -64,6 +64,9 @@ const PasswordForm = React.forwardRef(
               <FormParagraph warning={true}>{formWarnings.newPassword}</FormParagraph>
             )}
 
+            {formErrors.passwordRepeated && (
+              <FormParagraph error={true}>{formErrors.passwordRepeated}</FormParagraph>
+            )}
             <FormInput
               name='passwordRepeated'
               type='password'
