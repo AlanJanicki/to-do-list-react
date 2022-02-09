@@ -11,10 +11,17 @@ export const TaskWrapper = styled.li`
   row-gap: 10px;
   padding-bottom: 15px;
   border-bottom: 1px solid #dfe0df;
-  -webkit-text-size-adjust: 100%;
 
   input[type='checkbox'] {
     &:focus {
+      outline: 1px solid #ee7300;
+    }
+
+    &:focus:not(:focus-visible) {
+      outline: 0;
+    }
+
+    &:focus-visible {
       outline: 1px solid #ee7300;
     }
 
@@ -159,7 +166,8 @@ export const PriorityStarsList = styled.ul`
     cursor: pointer;
 
     &:focus {
-      outline: 1px solid #ee7300;
+      border: 2px solid #ee7300;
+      outline: 0;
     }
 
     &:focus:not(:focus-visible) {
@@ -167,7 +175,8 @@ export const PriorityStarsList = styled.ul`
     }
 
     &:focus-visible {
-      outline: 1px solid #ee7300;
+      border: 2px solid #ee7300;
+      outline: 0;
     }
 
     &:active {

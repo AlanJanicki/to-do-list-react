@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Draggable, DragDropContext, Droppable } from 'react-beautiful-dnd';
 
-import { TaskDate, TasksListWrapper } from './styles/StyledTasksList.js';
+import { TaskDate, TaskError, TasksListWrapper } from './styles/StyledTasksList.js';
 
 import Task from '../Task/Task';
 import Pagination from '../Pagination/Pagination.jsx';
@@ -32,6 +32,8 @@ const TasksList = () => {
   const controlPanelHeight = useSelector((state) => state.layout.controlPanelHeight);
   const headerHeight = useSelector((state) => state.layout.headerHeight);
   const isAccountMenuOpen = useSelector((state) => state.layout.isAccountMenuOpen);
+  const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
+  const isModalOpen = useSelector((state) => state.modal.isModalOpen);
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -53,10 +55,15 @@ const TasksList = () => {
               isAccountMenuOpen={isAccountMenuOpen}
               ref={provided.innerRef}
               {...provided.droppableProps}>
+              <TaskError>Błąd. Spróbuj ponownie!</TaskError>
               <TaskDate>2022-01-30</TaskDate>
               {tasksOrderDD.map(({ id, content }, index) => {
                 return (
-                  <Draggable draggableId={id} index={index} key={id}>
+                  <Draggable
+                    draggableId={id}
+                    index={index}
+                    isDragDisabled={isModalOpen || isLogoutTimeoutModalOpen}
+                    key={id}>
                     {(provided) => (
                       <Task innerRef={provided.innerRef} provided={provided}>
                         {content}

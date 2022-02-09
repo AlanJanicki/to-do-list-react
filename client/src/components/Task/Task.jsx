@@ -1,9 +1,14 @@
+import { useSelector } from 'react-redux';
+
 import { faArrowsAlt, faCheck, faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { PriorityStarsList, TaskWrapper } from './styles/StyledTask';
 
 const Task = ({ children, innerRef, provided }) => {
+  const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
+  const isModalOpen = useSelector((state) => state.modal.isModalOpen);
+
   const generatePriorityStars = (amount) => {
     let stars = [];
 
@@ -19,8 +24,8 @@ const Task = ({ children, innerRef, provided }) => {
 
   return (
     <TaskWrapper ref={innerRef} {...provided.draggableProps}>
-      <input type='checkbox' />
-      <button title={'Oznacz jako zrobione'}>
+      <input disabled={isModalOpen || isLogoutTimeoutModalOpen} type='checkbox' />
+      <button disabled={isModalOpen || isLogoutTimeoutModalOpen} title={'Oznacz jako zrobione'}>
         <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
       </button>
       <h3>{children}</h3>

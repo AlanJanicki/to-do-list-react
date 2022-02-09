@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Form, FormInput, FormParagraph } from '../styles/StyledForm';
+import { Form, FormInput, FormParagraph, LoadingSpinner } from '../styles/StyledForm';
 
 import Avatars from './Avatars';
 import SuccessInfo from './SuccessInfo';
@@ -10,13 +10,14 @@ const RegisterForm = React.forwardRef(
     {
       avatarValue,
       formErrors,
-      formSent,
+      formSentSuccessfully,
       formWarnings,
       handleErrorInformation,
       handleSubmitForm,
       handleUserInput,
-      nameValue,
+      loading,
       loginValue,
+      nameValue,
       passwordRepeatedValue,
       passwordValue,
     },
@@ -24,7 +25,7 @@ const RegisterForm = React.forwardRef(
   ) => {
     return (
       <>
-        {formSent ? (
+        {formSentSuccessfully ? (
           <SuccessInfo>Konto zostało utworzone! Możesz się zalogować.</SuccessInfo>
         ) : (
           <Form onSubmit={handleSubmitForm}>
@@ -68,6 +69,12 @@ const RegisterForm = React.forwardRef(
               value={passwordValue}
               onChange={(e) => handleUserInput(e)}
             />
+            {passwordValue.length === 0 && (
+              <FormParagraph warning={true}>
+                Wskazówka bezpieczeństwa: proszę użyć hasła, które nie jest używane w innych
+                serwisach.
+              </FormParagraph>
+            )}
             {formWarnings.password && (
               <FormParagraph warning={true}>{formWarnings.password}</FormParagraph>
             )}
@@ -85,7 +92,8 @@ const RegisterForm = React.forwardRef(
               onChange={(e) => handleUserInput(e)}
             />
             <Avatars avatarValue={avatarValue} handleUserInput={handleUserInput} />
-            <button type='submit'>Utwórz konto</button>
+
+            <button type='submit'>Utwórz konto{loading && <LoadingSpinner />}</button>
           </Form>
         )}
       </>

@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
-
+import { setUser } from '../../redux/authSlice';
 import { closeModal, openModal } from '../../redux/modalSlice';
 
+import { useNavigate } from 'react-router-dom';
+
+import { useMutation } from '@apollo/client';
+import { LOGIN_USER, REGISTER_USER } from '../../graphql/mutations/user';
+
 import { handleValidateInput } from '../../utils/formValidator';
-import { lockBodyScroll, unlockBodyScroll } from '../../utils/bodyScrollLock';
 
 import { FormParagraph } from './styles/StyledForm';
 
@@ -42,9 +46,12 @@ const Form = ({
   const [formData, setFormData] = useState(initFormDataState);
   const [formErrors, setFormErrors] = useState(initFormDataState);
   const [formKind, setFormKind] = useState(null);
-  const [formSent, setFormSent] = useState(false);
+  const [formSentSuccessfully, setFormSentSuccessfully] = useState(false);
   const [formWarnings, setFormWarnings] = useState(initFormDataState);
-  const [windowScrollY, setWindowScrollY] = useState(0);
+
+  const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
+  const isModalOpen = useSelector((state) => state.modal.isModalOpen);
+  const user = useSelector((state) => state.auth.user);
 
   const checkWarningData = useRef(null);
   const elementToSetFocus = useRef(null);
@@ -52,44 +59,88 @@ const Form = ({
   const modalElementToSetFocus = useRef(null);
 
   const dispatch = useDispatch();
-  const isModalOpen = useSelector((state) => state.modal.isModalOpen);
+
+  let navigate = useNavigate();
+
+  const [loginUser, { data: dataLoginUser, loading: loadingLoginUser, reset: resetLoginUser }] =
+    useMutation(LOGIN_USER, {
+      update() {
+        handleFormSent();
+        resetLoginUser();
+      },
+      onError(err) {
+        console.log(err);
+        if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
+          handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+        }
+        resetLoginUser();
+      },
+    });
+
+  const [registerUser, { loading: loadingRegisterUser, reset: resetRegisterUser }] = useMutation(
+    REGISTER_USER,
+    {
+      update() {
+        handleFormSent();
+        resetRegisterUser();
+      },
+      onError(err) {
+        console.log(err);
+        if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
+          handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+        }
+        resetRegisterUser();
+      },
+    }
+  );
 
   useEffect(() => {
-    setWindowScrollY(window.scrollY);
-  }, []);
+    if (dataLoginUser) {
+      dispatch(setUser(dataLoginUser.login));
+    }
+  }, [dataLoginUser, dispatch]);
+
+  useEffect(() => {
+    if (user) {
+      navigate('/home');
+    }
+  }, [navigate, user]);
 
   useEffect(() => {
     if (isModalOpenOnInit) {
-      lockBodyScroll(windowScrollY);
-      setTimeout(() => {
-        dispatch(openModal());
-      }, 1);
+      dispatch(openModal());
     }
-  }, [dispatch, isModalOpenOnInit, windowScrollY]);
+  }, [dispatch, isModalOpenOnInit]);
 
   useEffect(() => {
-    if (isModalOpen) {
+    if (!lastActiveElement.current) {
       lastActiveElement.current = document.activeElement;
+    }
+
+    if (isModalOpen) {
       setTimeout(() => {
-        modalElementToSetFocus.current.focus();
-        if (modalElementToSetFocus.current.type === 'radio') {
-          modalElementToSetFocus.current.checked = true;
+        if (modalElementToSetFocus.current) {
+          modalElementToSetFocus.current.focus();
+          if (modalElementToSetFocus.current.type === 'radio') {
+            modalElementToSetFocus.current.checked = true;
+          }
         }
       }, 100);
     } else if (elementToSetFocus.current) {
       elementToSetFocus.current.focus();
     } else if (lastActiveElement.current) {
-      lastActiveElement.current.focus();
+      setTimeout(() => {
+        lastActiveElement.current.focus();
+      }, 100);
     }
-  }, [isModalOpen]);
+  }, [isLogoutTimeoutModalOpen, isModalOpen]);
 
   const handleOpenModal = (e) => {
     e.preventDefault();
-    if (formSent) {
-      setFormSent(false);
+    if (formSentSuccessfully) {
+      setFormSentSuccessfully(false);
     }
     handleClearFormState([setFormData, setFormErrors, setFormWarnings]);
-    lockBodyScroll(windowScrollY);
     dispatch(openModal());
   };
 
@@ -101,7 +152,6 @@ const Form = ({
     if (disableForm) {
       disableForm();
     }
-    unlockBodyScroll(windowScrollY);
     handleClearFormState([setFormData, setFormErrors, setFormWarnings]);
     checkWarningData.current = initFormDataState;
   };
@@ -122,23 +172,39 @@ const Form = ({
   };
 
   const handleSubmitForm = (e) => {
-    let shouldCloseModal = handleCloseModalOnSubmitForm();
-
     e.preventDefault();
     handleClearFormState([setFormErrors]);
     const { errors } = handleValidateInput(formData);
     handleSetErrors(errors);
-
     if (errors.length === 0) {
-      console.log('form sent');
-      setFormSent(true);
-      handleClearFormState([setFormData, setFormErrors, setFormWarnings]);
-      checkWarningData.current = initFormDataState;
-      if (shouldCloseModal) {
-        handleCloseModal();
+      if (formKind === 'loginForm') {
+        loginUser({ variables: { login: formData.login, password: formData.password } });
+      }
+      if (formKind === 'registerForm') {
+        registerUser({
+          variables: {
+            input: {
+              avatar: formData.avatar,
+              login: formData.login,
+              name: formData.name,
+              password: formData.password,
+              passwordRepeated: formData.passwordRepeated,
+            },
+          },
+        });
       }
     }
-    if (!shouldCloseModal) {
+    handleScrollModal();
+  };
+
+  const handleFormSent = () => {
+    let shouldCloseModal = handleCloseModalOnSubmitForm();
+    setFormSentSuccessfully(true);
+    handleClearFormState([setFormData, setFormErrors, setFormWarnings]);
+    checkWarningData.current = initFormDataState;
+    if (shouldCloseModal) {
+      handleCloseModal();
+    } else {
       handleScrollModal();
     }
   };
@@ -195,7 +261,9 @@ const Form = ({
   };
 
   const handleScrollModal = () => {
-    modalElementToSetFocus.current.scrollIntoView({ behavior: 'smooth' });
+    if (modalElementToSetFocus.current) {
+      modalElementToSetFocus.current.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -206,6 +274,8 @@ const Form = ({
             formErrors={formErrors}
             formWarnings={formWarnings}
             isModalOpen={isModalOpen}
+            isLogoutTimeoutModalOpen={isLogoutTimeoutModalOpen}
+            loading={loadingLoginUser}
             loginValue={formData.login}
             passwordValue={formData.password}
             ref={elementToSetFocus}
@@ -219,8 +289,9 @@ const Form = ({
             <RegisterForm
               avatarValue={formData.avatar}
               formErrors={formErrors}
-              formSent={formSent}
+              formSentSuccessfully={formSentSuccessfully}
               formWarnings={formWarnings}
+              loading={loadingRegisterUser}
               loginValue={formData.login}
               nameValue={formData.name}
               passwordValue={formData.password}
@@ -242,6 +313,7 @@ const Form = ({
             handleErrorInformation={handleErrorInformation}
             handleSubmitForm={handleSubmitForm}
             handleUserInput={handleUserInput}
+            isLogoutTimeoutModalOpen={isLogoutTimeoutModalOpen}
             setFormKind={setFormKind}
           />
         </Modal>
@@ -250,8 +322,9 @@ const Form = ({
         <Modal handleCloseModal={handleCloseModal}>
           <PasswordForm
             formErrors={formErrors}
-            formSent={formSent}
+            formSentSuccessfully={formSentSuccessfully}
             formWarnings={formWarnings}
+            isLogoutTimeoutModalOpen={isLogoutTimeoutModalOpen}
             newPasswordValue={formData.newPassword}
             newPasswordValueRepeated={formData.newPasswordRepeated}
             oldPasswordValue={formData.oldPassword}
@@ -268,6 +341,7 @@ const Form = ({
           <TaskForm
             formErrors={formErrors}
             formWarnings={formWarnings}
+            isLogoutTimeoutModalOpen={isLogoutTimeoutModalOpen}
             taskBodyValue={formData.taskBody}
             taskFinishDateValue={formData.taskFinishDate}
             taskPriorityValue={formData.taskPriority}
@@ -283,6 +357,7 @@ const Form = ({
         <Modal handleCloseModal={handleCloseModal}>
           <ClearTasksListForm
             handleCloseModal={handleCloseModal}
+            isLogoutTimeoutModalOpen={isLogoutTimeoutModalOpen}
             ref={modalElementToSetFocus}
             handleSubmitForm={handleSubmitForm}
             handleUserInput={handleUserInput}

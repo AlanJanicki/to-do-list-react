@@ -21,13 +21,13 @@ const typeDefs = gql`
     id: ID!
     login: String!
     name: String!
-    token: String!
+    token: String
   }
 
   input ChangePasswordInput {
-    oldPassword: String!
     newPassword: String!
     newPasswordRepeated: String!
+    oldPassword: String!
   }
 
   input RegisterInput {
@@ -43,7 +43,7 @@ const typeDefs = gql`
     createdAt: String
     done: Boolean
     finishDate: String
-    id: ID!
+    id: ID
     priority: String
   }
 
@@ -55,6 +55,7 @@ const typeDefs = gql`
     login(login: String!, password: String!): User!
     register(input: RegisterInput): User!
     updateTasksOrder(input: [TaskInput]): TasksList!
+    updateUserAvatar(avatar: String!): User!
     updateUserPassword(input: ChangePasswordInput!): User!
   }
 

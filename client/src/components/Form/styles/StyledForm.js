@@ -72,6 +72,10 @@ export const Form = styled.form`
 
   button {
     margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    column-gap: 10px;
     width: 70vw;
     max-width: 100%;
     padding: 15px;
@@ -82,8 +86,8 @@ export const Form = styled.form`
     cursor: pointer;
 
     &:focus {
-      box-shadow: 0 0 0 2px #ee7300;
-      outline: none;
+      border: 2px solid #ee7300;
+      outline: 0;
     }
 
     &:nth-of-type(1) {
@@ -130,19 +134,8 @@ export const FormInput = styled.input`
   }
 
   &:focus {
-    outline: 1px solid #ee7300;
-  }
-
-  &[type='radio']:focus {
-    outline: 1px solid #ee7300;
-  }
-
-  &[type='radio']:focus:not(:focus-visible) {
+    border: 1px solid #ee7300;
     outline: 0;
-  }
-
-  &[type='radio']:focus-visible {
-    outline: 1px solid #ee7300;
   }
 
   @media (min-width: 768px) {
@@ -163,7 +156,8 @@ export const FormTextArea = styled.textarea`
   border-radius: 5px;
 
   &:focus {
-    outline: 1px solid #ee7300;
+    border: 1px solid #ee7300;
+    outline: 0;
   }
 
   @media (min-width: 768px) {
@@ -257,6 +251,7 @@ export const Priority = styled.li`
   justify-content: center;
   align-items: center;
   column-gap: 10px;
+  padding: 5px 0;
 
   label {
     color: ${(props) => {
@@ -294,6 +289,22 @@ export const ClearTasksListFormWrapper = styled.div`
 
     @media (min-width: 992px) {
       max-width: 230px;
+    }
+  }
+`;
+
+export const LoadingSpinner = styled.span`
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
     }
   }
 `;

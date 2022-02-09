@@ -23,9 +23,8 @@ export const Menu = styled.ul`
     background-color: #ee7300;
     font-weight: bold;
     text-align: center;
-    -webkit-text-size-adjust: 100%;
     cursor: pointer;
-    outline-offset: -6px;
+    outline-offset: -4px;
 
     &:focus {
       outline: 1px solid #fff;
@@ -40,7 +39,7 @@ export const Menu = styled.ul`
     }
 
     &:nth-of-type(1) {
-      outline: ${(props) => props.removedOutline && 'none'};
+      outline: ${(props) => props.removedOutline && '0'};
     }
 
     @media (hover: hover) {

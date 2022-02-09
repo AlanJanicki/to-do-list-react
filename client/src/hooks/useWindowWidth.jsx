@@ -1,12 +1,6 @@
 import { useEffect, useState } from 'react';
 
-const debounce = (fn, delay) => {
-  let timer;
-  return () => {
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(fn, delay);
-  };
-};
+import { debounce } from '../utils/debounce';
 
 const useWindowWidth = () => {
   const [dimension, setDimension] = useState(window.innerWidth);

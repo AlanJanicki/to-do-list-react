@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 import {
+  validateChangeAvatarInput,
   validateChangePasswordInput,
   validateLoginInput,
   validateRegisterInput,
@@ -14,13 +15,9 @@ import TasksList from '../../models/TasksList.js';
 import User from '../../models/User.js';
 
 const generateToken = (user) => {
-  return jwt.sign(
-    {
-      id: user.id,
-    },
-    process.env.JSONWT_KEY,
-    { expiresIn: '1h' }
-  );
+  return jwt.sign({ avatar: user.avatar, id: user.id, name: user.name }, process.env.JSONWT_KEY, {
+    expiresIn: '6h',
+  });
 };
 
 const user = {
@@ -50,7 +47,7 @@ const user = {
       }
       const token = generateToken(user);
 
-      return { id: user.id, name: user.name, token };
+      return { avatar: user.avatar, id: user.id, name: user.name, token };
     },
 
     async register(_, { input: { avatar, login, name, password, passwordRepeated } }) {
@@ -67,6 +64,7 @@ const user = {
           },
         });
       }
+
       password = await bcrypt.hash(password, 10);
 
       const newUser = new User({
@@ -76,20 +74,29 @@ const user = {
         password,
       });
 
-      const res = await newUser.save();
-
-      const newTasksList = await new TasksList({ tasks: [], userId: res.id }).save();
-      if (!newTasksList) {
+      let res;
+      try {
+        res = await newUser.save();
+      } catch (error) {
         throw new UserInputError('Błąd', {
           errors: {
-            uncategorizedErrors: 'Nie udało się utworzyć tablicy zadań dla użytkownika',
+            uncategorizedErrors: 'Nie udało się utworzyć użytkownika. Spróbuj ponownie.',
           },
         });
       }
 
-      const token = generateToken(res);
+      try {
+        await new TasksList({ tasks: [], userId: res.id }).save();
+      } catch (error) {
+        throw new UserInputError('Błąd', {
+          errors: {
+            uncategorizedErrors:
+              'Nie udało się utworzyć tablicy zadań dla użytkownika. Spróbuj ponownie.',
+          },
+        });
+      }
 
-      return { id: res.id, name: res.name, token };
+      return { id: res.id };
     },
 
     async updateUserPassword(
@@ -124,9 +131,53 @@ const user = {
 
       newPassword = await bcrypt.hash(newPassword, 10);
 
-      const res = await User.findByIdAndUpdate(user.id, { password: newPassword }, { new: true });
+      let res;
+      try {
+        res = await User.findByIdAndUpdate(user.id, { password: newPassword }, { new: true });
+      } catch (error) {
+        throw new UserInputError('Błąd', {
+          errors: {
+            uncategorizedErrors: 'Nie udało się utworzyć zmienić hasła. Spróbuj ponownie.',
+          },
+        });
+      }
 
-      return { id: res.id, name: res.name };
+      const token = generateToken(res);
+
+      return { avatar: res.avatar, id: res.id, name: res.name, token };
+    },
+
+    async updateUserAvatar(_, { avatar }, context) {
+      const user = verifyAuth(context);
+
+      const errors = validateChangeAvatarInput(avatar);
+      if (errors.length > 0) {
+        throw new UserInputError('Błędy', { errors });
+      }
+
+      const userToUpdate = await User.findById(user.id);
+      if (!userToUpdate) {
+        throw new UserInputError('Błąd', {
+          errors: {
+            uncategorizedErrors: 'Nie odnaleziono użytkownika o podanym ID',
+          },
+        });
+      }
+
+      let res;
+      try {
+        res = await User.findByIdAndUpdate(user.id, { avatar }, { new: true });
+      } catch (error) {
+        throw new UserInputError('Błąd', {
+          errors: {
+            uncategorizedErrors: 'Nie udało się utworzyć zmienić avatara. Spróbuj ponownie.',
+          },
+        });
+      }
+
+      const token = generateToken(res);
+
+      return { avatar: res.avatar, id: res.id, name: res.name, token };
     },
   },
 };

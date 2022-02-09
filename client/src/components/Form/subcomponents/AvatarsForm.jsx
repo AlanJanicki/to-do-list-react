@@ -12,6 +12,7 @@ const AvatarsForm = React.forwardRef(
       handleErrorInformation,
       handleSubmitForm,
       handleUserInput,
+      isLogoutTimeoutModalOpen,
       setFormKind,
     },
     ref
@@ -25,7 +26,10 @@ const AvatarsForm = React.forwardRef(
         {handleErrorInformation()}
         {formErrors.avatar && <FormParagraph error={true}>{formErrors.avatar}</FormParagraph>}
         <Avatars avatarValue={avatarValue} ref={ref} handleUserInput={handleUserInput} />
-        <button type='submit'>Wybierz</button>
+
+        <button type='submit' disabled={isLogoutTimeoutModalOpen}>
+          Wybierz
+        </button>
       </Form>
     );
   }

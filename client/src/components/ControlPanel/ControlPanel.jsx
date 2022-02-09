@@ -1,6 +1,8 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
+import { setControlPanelHeight } from '../../redux/layoutSlice';
+
 import {
   faAngleDoubleDown,
   faEdit,
@@ -9,8 +11,6 @@ import {
   faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { setControlPanelHeight } from '../../redux/layoutSlice';
 
 import useWindowWidth from '../../hooks/useWindowWidth';
 
@@ -34,10 +34,13 @@ const ControlPanel = () => {
   const [showDisplaySelect, setShowDisplaySelect] = useState(false);
   const [showSortSelect, setShowSortSelect] = useState(false);
 
+  const headerHeight = useSelector((state) => state.layout.headerHeight);
+  const isModalOpen = useSelector((state) => state.modal.isModalOpen);
+  const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
+
   const controlPanel = useRef(null);
 
   const dispatch = useDispatch();
-  const headerHeight = useSelector((state) => state.layout.headerHeight);
 
   const windowWidth = useWindowWidth();
 
@@ -88,20 +91,31 @@ const ControlPanel = () => {
             <span></span>
           </Welcome>
           <Controls>
-            <button data-option='addTask' title={'Dodaj zadanie'} onClick={handleSelectOption}>
+            <button
+              data-option='addTask'
+              disabled={isModalOpen || isLogoutTimeoutModalOpen}
+              title={'Dodaj zadanie'}
+              onClick={handleSelectOption}>
               <FontAwesomeIcon icon={faPlusCircle} />
               {windowWidth > 660 && <p>Dodaj zadanie</p>}
             </button>
-            <button data-option='removeTask' title={'Usuń zadanie'}>
+            <button
+              data-option='removeTask'
+              disabled={isModalOpen || isLogoutTimeoutModalOpen}
+              title={'Usuń zadanie'}>
               <FontAwesomeIcon icon={faMinusCircle} />
               {windowWidth > 660 && <p>Usuń zadanie</p>}
             </button>
-            <button data-option='editTask' title={'Edytuj zadanie'}>
+            <button
+              data-option='editTask'
+              disabled={isModalOpen || isLogoutTimeoutModalOpen}
+              title={'Edytuj zadanie'}>
               <FontAwesomeIcon icon={faEdit} />
               {windowWidth > 660 && <p>Edytuj zadanie</p>}
             </button>
             <button
               data-option='clearTasksList'
+              disabled={isModalOpen || isLogoutTimeoutModalOpen}
               title={'Wyczyść listę'}
               onClick={handleSelectOption}>
               <FontAwesomeIcon icon={faTrashAlt} />
@@ -111,6 +125,7 @@ const ControlPanel = () => {
         </ControlPanelWrapper>
         <Manage showDisplaySelect={showDisplaySelect} showSortSelect={showSortSelect}>
           <ManageButton
+            disabled={isModalOpen || isLogoutTimeoutModalOpen}
             runFadeOutSortSelectAnimation={runFadeOutSortSelectAnimation}
             sortSelectButton={true}
             onClick={handleToggleShowSortSelect}>
@@ -133,6 +148,7 @@ const ControlPanel = () => {
             <option value='lowestPriority'>Priorytetu (od najmniej ważnego)</option>
           </Sort>
           <ManageButton
+            disabled={isModalOpen || isLogoutTimeoutModalOpen}
             displaySelectButton={true}
             runFadeOutDisplaySelectAnimation={runFadeOutDisplaySelectAnimation}
             onClick={handleToggleShowDisplaySelect}>

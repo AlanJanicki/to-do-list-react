@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { ClearTasksListFormWrapper, Form } from '../styles/StyledForm';
 
 const ClearTasksListForm = React.forwardRef(
-  ({ handleCloseModal, handleSubmitForm, setFormKind }, ref) => {
+  ({ handleCloseModal, handleSubmitForm, isLogoutTimeoutModalOpen, setFormKind }, ref) => {
     useEffect(() => {
       setFormKind('clearTasksListForm');
     }, [setFormKind]);
@@ -14,10 +14,12 @@ const ClearTasksListForm = React.forwardRef(
           <p>
             Ta operacja usunie wszystkie zadania! <br /> Czy na pewno chcesz to zrobić?
           </p>
-          <button type='submit' ref={ref}>
+          <button disabled={isLogoutTimeoutModalOpen} type='submit' ref={ref}>
             Potwierdź
           </button>
-          <button onClick={handleCloseModal}>Anuluj</button>
+          <button disabled={isLogoutTimeoutModalOpen} onClick={handleCloseModal}>
+            Anuluj
+          </button>
         </ClearTasksListFormWrapper>
       </Form>
     );

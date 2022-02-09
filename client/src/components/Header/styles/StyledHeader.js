@@ -68,7 +68,8 @@ export const Search = styled.form`
   }
 
   input:focus {
-    outline: 1px solid #ee7300;
+    border: 1px solid #ee7300;
+    outline: 0;
   }
 
   span {

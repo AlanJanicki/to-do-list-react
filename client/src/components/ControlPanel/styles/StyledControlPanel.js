@@ -130,7 +130,8 @@ export const Manage = styled.div`
     }
 
     &:focus {
-      outline: 1px solid #ee7300;
+      border: 1px solid #ee7300;
+      outline: 0;
     }
 
     @media (min-width: 778px) {

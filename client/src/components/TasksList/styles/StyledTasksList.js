@@ -31,3 +31,14 @@ export const TaskDate = styled.h3`
     font-size: 1.8rem;
   }
 `;
+
+export const TaskError = styled.p`
+  flex-basis: 100%;
+  margin-bottom: 15px;
+  color: red;
+  text-align: center;
+
+  @media (min-width: 992px) {
+    font-size: 1.1rem;
+  }
+`;

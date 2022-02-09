@@ -58,6 +58,16 @@ export const validateRegisterInput = (avatar, login, name, password, passwordRep
   return errors;
 };
 
+export const validateChangeAvatarInput = (avatar) => {
+  const errors = [];
+
+  if (typeof avatar !== 'string') {
+    errors.push({ avatar: 'Nieprawidłowy format avatara' });
+  }
+
+  return errors;
+};
+
 export const validateChangePasswordInput = (oldPassword, newPassword, newPasswordRepeated) => {
   const errors = [];
 

@@ -1,6 +1,14 @@
 import React, { useEffect } from 'react';
 
-import { Form, FormInput, FormParagraph, FormWrapper, Logo, Wrapper } from '../styles/StyledForm';
+import {
+  Form,
+  FormInput,
+  FormParagraph,
+  FormWrapper,
+  LoadingSpinner,
+  Logo,
+  Wrapper,
+} from '../styles/StyledForm';
 
 const LoginForm = React.forwardRef(
   (
@@ -8,10 +16,12 @@ const LoginForm = React.forwardRef(
       formErrors,
       formWarnings,
       isModalOpen,
+      isLogoutTimeoutModalOpen,
       handleErrorInformation,
       handleOpenModal,
       handleSubmitForm,
       handleUserInput,
+      loading,
       loginValue,
       passwordValue,
       setFormKind,
@@ -37,6 +47,7 @@ const LoginForm = React.forwardRef(
             {handleErrorInformation()}
             {formErrors.login && <FormParagraph error={true}>{formErrors.login}</FormParagraph>}
             <FormInput
+              disabled={isModalOpen || isLogoutTimeoutModalOpen}
               name='login'
               placeholder='Login'
               type='text'
@@ -55,6 +66,7 @@ const LoginForm = React.forwardRef(
               <FormParagraph error={true}>{formErrors.password}</FormParagraph>
             )}
             <FormInput
+              disabled={isModalOpen || isLogoutTimeoutModalOpen}
               name='password'
               placeholder='Hasło'
               type='password'
@@ -67,8 +79,15 @@ const LoginForm = React.forwardRef(
               <FormParagraph warning={true}>{formWarnings.password}</FormParagraph>
             )}
 
-            <button type='submit'>Zaloguj się</button>
-            <button onClick={(e) => handleOpenRegisterForm(e)}>Utwórz nowe konto</button>
+            <button disabled={isModalOpen || isLogoutTimeoutModalOpen} type='submit'>
+              Zaloguj się
+              {loading && <LoadingSpinner />}
+            </button>
+            <button
+              disabled={isModalOpen || isLogoutTimeoutModalOpen}
+              onClick={(e) => handleOpenRegisterForm(e)}>
+              Utwórz nowe konto
+            </button>
           </Form>
         </FormWrapper>
       </Wrapper>

@@ -1,8 +1,12 @@
 import React from 'react';
 
+import { useSelector } from 'react-redux';
+
 import { Avatar, AvatarsWrapper, FormParagraph } from '../styles/StyledForm';
 
 const Avatars = React.forwardRef(({ avatarValue, handleUserInput }, ref) => {
+  const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
+
   const avatars = [];
 
   const generateAvatars = () => {
@@ -16,6 +20,7 @@ const Avatars = React.forwardRef(({ avatarValue, handleUserInput }, ref) => {
           <label htmlFor={i}></label>
           {i === 1 ? (
             <input
+              disabled={isLogoutTimeoutModalOpen}
               id={i}
               name='avatar'
               type='radio'
@@ -26,6 +31,7 @@ const Avatars = React.forwardRef(({ avatarValue, handleUserInput }, ref) => {
             />
           ) : (
             <input
+              disabled={isLogoutTimeoutModalOpen}
               id={i}
               name='avatar'
               type='radio'

@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
-
+import { removeUser } from '../../redux/authSlice';
 import { closeAccountMenu, setAccountMenuHeight } from '../../redux/layoutSlice';
 
 import useWindowWidth from '../../hooks/useWindowWidth';
@@ -14,15 +14,17 @@ const AccountMenu = () => {
   const [removedOutline, setRemovedOutline] = useState(false);
   const [selectedOption, setSelectedOption] = useState();
 
+  const controlPanelHeight = useSelector((state) => state.layout.controlPanelHeight);
+  const headerHeight = useSelector((state) => state.layout.headerHeight);
+  const isAccountMenuOpen = useSelector((state) => state.layout.isAccountMenuOpen);
+  const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
+  const isModalOpen = useSelector((state) => state.modal.isModalOpen);
+
   const accountMenu = useRef(null);
   const elementToFocus = useRef(null);
   const lastActiveElement = useRef(null);
 
   const dispatch = useDispatch();
-  const controlPanelHeight = useSelector((state) => state.layout.controlPanelHeight);
-  const headerHeight = useSelector((state) => state.layout.headerHeight);
-  const isAccountMenuOpen = useSelector((state) => state.layout.isAccountMenuOpen);
-  const isModalOpen = useSelector((state) => state.modal.isModalOpen);
 
   const windowWidth = useWindowWidth();
 
@@ -38,11 +40,11 @@ const AccountMenu = () => {
     } else if (lastActiveElement.current) {
       lastActiveElement.current.focus();
     }
-  }, [isAccountMenuOpen]);
+  }, [isAccountMenuOpen, isLogoutTimeoutModalOpen]);
 
   useEffect(() => {
     const handleCloseMenuWithKeyboard = (e) => {
-      if (e.code === 'Escape' && !isModalOpen) {
+      if (e.code === 'Escape' && !isModalOpen && !isLogoutTimeoutModalOpen && isAccountMenuOpen) {
         dispatch(closeAccountMenu());
       }
     };
@@ -52,7 +54,7 @@ const AccountMenu = () => {
     return () => {
       window.removeEventListener('keydown', handleCloseMenuWithKeyboard);
     };
-  }, [dispatch, isModalOpen]);
+  }, [dispatch, isAccountMenuOpen, isLogoutTimeoutModalOpen, isModalOpen]);
 
   const handleSelectOption = (e) => {
     setSelectedOption(e.target.getAttribute('data-option'));
@@ -62,6 +64,11 @@ const AccountMenu = () => {
     setTimeout(() => {
       setSelectedOption(null);
     }, 500);
+  };
+
+  const handleLogoutUser = () => {
+    dispatch(removeUser());
+    dispatch(closeAccountMenu());
   };
 
   return (
@@ -74,6 +81,7 @@ const AccountMenu = () => {
         ref={accountMenu}>
         <button
           data-option='changePassword'
+          disabled={isModalOpen || isLogoutTimeoutModalOpen}
           tabIndex={!isAccountMenuOpen ? -1 : null}
           ref={elementToFocus}
           onClick={handleSelectOption}
@@ -84,11 +92,16 @@ const AccountMenu = () => {
         </button>
         <button
           data-option='changeAvatar'
+          disabled={isModalOpen || isLogoutTimeoutModalOpen}
           tabIndex={!isAccountMenuOpen ? -1 : null}
           onClick={handleSelectOption}>
           Zmień avatar
         </button>
-        <button data-option='logout' tabIndex={!isAccountMenuOpen ? -1 : null}>
+        <button
+          data-option='logout'
+          disabled={isModalOpen || isLogoutTimeoutModalOpen}
+          tabIndex={!isAccountMenuOpen ? -1 : null}
+          onClick={handleLogoutUser}>
           Wyloguj się
         </button>
       </Menu>

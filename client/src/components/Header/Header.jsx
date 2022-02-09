@@ -1,21 +1,24 @@
 import { useLayoutEffect, useRef } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
+import { setHeaderHeight, toggleAccountMenu } from '../../redux/layoutSlice';
+
 import * as Scroll from 'react-scroll';
 import { faBars, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import useWindowWidth from '../../hooks/useWindowWidth';
 
-import { setHeaderHeight, toggleAccountMenu } from '../../redux/layoutSlice';
-
 import { HeaderWrapper, Logo, NavMenuButton, Search } from './styles/StyledHeader';
 
 const Header = () => {
+  const isAccountMenuOpen = useSelector((state) => state.layout.isAccountMenuOpen);
+  const isModalOpen = useSelector((state) => state.modal.isModalOpen);
+  const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
+
   const header = useRef(null);
 
   const dispatch = useDispatch();
-  const isAccountMenuOpen = useSelector((state) => state.layout.isAccountMenuOpen);
 
   const windowWidth = useWindowWidth();
 
@@ -29,21 +32,32 @@ const Header = () => {
     scroll.scrollToTop({ duration: 400 });
   };
 
+  const handleToggleAccountMenu = () => {
+    dispatch(toggleAccountMenu());
+  };
+
   return (
     <HeaderWrapper ref={header}>
       <Logo onClick={handleScrollTop}>
-        <button>{windowWidth < 768 ? 'T-D' : 'To-do List'}</button>
+        <button disabled={isModalOpen || isLogoutTimeoutModalOpen}>
+          {windowWidth < 768 ? 'T-D' : 'To-do List'}
+        </button>
       </Logo>
       <Search>
-        <input type='text' placeholder='Szukane zadanie...' />
+        <input
+          disabled={isModalOpen || isLogoutTimeoutModalOpen}
+          type='text'
+          placeholder='Szukane zadanie...'
+        />
         <span>
           <FontAwesomeIcon icon={faSearch} />
         </span>
       </Search>
       <NavMenuButton
+        disabled={isModalOpen || isLogoutTimeoutModalOpen}
         title={'Menu użytkownika'}
         isAccountMenuOpen={isAccountMenuOpen}
-        onClick={() => dispatch(toggleAccountMenu())}>
+        onClick={handleToggleAccountMenu}>
         <FontAwesomeIcon icon={faBars} />
       </NavMenuButton>
     </HeaderWrapper>

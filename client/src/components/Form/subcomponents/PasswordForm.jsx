@@ -8,11 +8,12 @@ const PasswordForm = React.forwardRef(
   (
     {
       formErrors,
-      formSent,
+      formSentSuccessfully,
       formWarnings,
       handleErrorInformation,
       handleUserInput,
       handleSubmitForm,
+      isLogoutTimeoutModalOpen,
       newPasswordValue,
       newPasswordValueRepeated,
       oldPasswordValue,
@@ -26,7 +27,7 @@ const PasswordForm = React.forwardRef(
 
     return (
       <>
-        {formSent ? (
+        {formSentSuccessfully ? (
           <SuccessInfo>Hasło zostało zmienione</SuccessInfo>
         ) : (
           <Form onSubmit={handleSubmitForm}>
@@ -35,6 +36,7 @@ const PasswordForm = React.forwardRef(
               <FormParagraph error={true}>{formErrors.oldPassword}</FormParagraph>
             )}
             <FormInput
+              disabled={isLogoutTimeoutModalOpen}
               name='oldPassword'
               type='password'
               placeholder='Stare hasło'
@@ -52,6 +54,7 @@ const PasswordForm = React.forwardRef(
               <FormParagraph error={true}>{formErrors.newPassword}</FormParagraph>
             )}
             <FormInput
+              disabled={isLogoutTimeoutModalOpen}
               name='newPassword'
               type='password'
               placeholder='Nowe hasło'
@@ -60,6 +63,12 @@ const PasswordForm = React.forwardRef(
               value={newPasswordValue}
               onChange={(e) => handleUserInput(e)}
             />
+            {newPasswordValue.length === 0 && (
+              <FormParagraph warning={true}>
+                Wskazówka bezpieczeństwa: proszę użyć hasła, które nie jest używane w innych
+                serwisach.
+              </FormParagraph>
+            )}
             {formWarnings.newPassword && (
               <FormParagraph warning={true}>{formWarnings.newPassword}</FormParagraph>
             )}
@@ -68,6 +77,7 @@ const PasswordForm = React.forwardRef(
               <FormParagraph error={true}>{formErrors.passwordRepeated}</FormParagraph>
             )}
             <FormInput
+              disabled={isLogoutTimeoutModalOpen}
               name='passwordRepeated'
               type='password'
               placeholder='Powtórz hasło'
@@ -76,7 +86,10 @@ const PasswordForm = React.forwardRef(
               value={newPasswordValueRepeated}
               onChange={(e) => handleUserInput(e)}
             />
-            <button type='submit'>Zatwierdź</button>
+
+            <button disabled={isLogoutTimeoutModalOpen} type='submit'>
+              Zatwierdź
+            </button>
           </Form>
         )}
       </>

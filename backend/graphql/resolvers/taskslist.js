@@ -25,11 +25,19 @@ const taskslist = {
           finishDate,
           priority,
         });
-        await tasksList.save();
+        try {
+          await tasksList.save();
+        } catch (error) {
+          throw new UserInputError('Błąd', {
+            errors: {
+              tasks: 'Nie udało się dodać zadania. Spróbuj ponownie.',
+            },
+          });
+        }
       } else {
         throw new UserInputError('Błąd', {
           errors: {
-            uncategorizedErrors: 'Nie odnaleziono tablicy zadań dla użytkownika',
+            tasks: 'Nie odnaleziono tablicy zadań dla użytkownika',
           },
         });
       }
@@ -51,11 +59,19 @@ const taskslist = {
           });
         }
         tasksList.tasks.splice(taskIndex, 1);
-        await tasksList.save();
+        try {
+          await tasksList.save();
+        } catch (error) {
+          throw new UserInputError('Błąd', {
+            errors: {
+              tasks: 'Nie udało się usunąć zadania. Spróbuj ponownie.',
+            },
+          });
+        }
       } else {
         throw new UserInputError('Błąd', {
           errors: {
-            uncategorizedErrors: 'Nie odnaleziono tablicy zadań dla użytkownika',
+            tasks: 'Nie odnaleziono tablicy zadań dla użytkownika',
           },
         });
       }
@@ -69,11 +85,19 @@ const taskslist = {
       const tasksList = await TasksList.findOne({ userId: user.id });
       if (tasksList) {
         tasksList.tasks.splice(0);
-        await tasksList.save();
+        try {
+          await tasksList.save();
+        } catch (error) {
+          throw new UserInputError('Błąd', {
+            errors: {
+              tasks: 'Nie udało się usunąć zadań. Spróbuj ponownie.',
+            },
+          });
+        }
       } else {
         throw new UserInputError('Błąd', {
           errors: {
-            uncategorizedErrors: 'Nie odnaleziono tablicy zadań dla użytkownika',
+            tasks: 'Nie odnaleziono tablicy zadań dla użytkownika',
           },
         });
       }
@@ -107,11 +131,19 @@ const taskslist = {
           priority,
         };
         tasksList.tasks.splice(taskIndex, 1, task);
-        await tasksList.save();
+        try {
+          await tasksList.save();
+        } catch (error) {
+          throw new UserInputError('Błąd', {
+            errors: {
+              tasks: 'Nie udało się edytować zadania. Spróbuj ponownie.',
+            },
+          });
+        }
       } else {
         throw new UserInputError('Błąd', {
           errors: {
-            uncategorizedErrors: 'Nie odnaleziono tablicy zadań dla użytkownika',
+            tasks: 'Nie odnaleziono tablicy zadań dla użytkownika',
           },
         });
       }
@@ -126,11 +158,19 @@ const taskslist = {
       if (tasksList) {
         tasksList.tasks.splice(0);
         tasksList.tasks = input;
-        await tasksList.save();
+        try {
+          await tasksList.save();
+        } catch (error) {
+          throw new UserInputError('Błąd', {
+            errors: {
+              tasks: 'Nie udało się zaktualizować kolejności listy zadań. Spróbuj ponownie.',
+            },
+          });
+        }
       } else {
         throw new UserInputError('Błąd', {
           errors: {
-            uncategorizedErrors: 'Nie odnaleziono tablicy zadań dla użytkownika',
+            tasks: 'Nie odnaleziono tablicy zadań dla użytkownika',
           },
         });
       }
@@ -143,7 +183,16 @@ const taskslist = {
     async getTasks(_, __, context) {
       const user = verifyAuth(context);
 
-      const tasksList = await TasksList.findOne({ userId: user.id });
+      let tasksList;
+      try {
+        tasksList = await TasksList.findOne({ userId: user.id });
+      } catch (error) {
+        throw new UserInputError('Błąd', {
+          errors: {
+            tasks: 'Nie udało się pobrać listy zadań. Spróbuj ponownie.',
+          },
+        });
+      }
 
       return tasksList;
     },

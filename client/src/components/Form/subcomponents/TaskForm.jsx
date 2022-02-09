@@ -20,8 +20,9 @@ const TaskForm = React.forwardRef(
       handleErrorInformation,
       handleUserInput,
       handleSubmitForm,
-      taskFinishDateValue,
+      isLogoutTimeoutModalOpen,
       taskBodyValue,
+      taskFinishDateValue,
       taskPriorityValue,
       setFormKind,
     },
@@ -41,6 +42,7 @@ const TaskForm = React.forwardRef(
         priorityStars.push(
           <Priority key={i} amount={i}>
             <input
+              disabled={isLogoutTimeoutModalOpen}
               id={i}
               name='taskPriority'
               type='radio'
@@ -59,11 +61,12 @@ const TaskForm = React.forwardRef(
         {handleErrorInformation()}
         {formErrors.taskBody && <FormParagraph error={true}>{formErrors.taskBody}</FormParagraph>}
         <FormTextArea
+          disabled={isLogoutTimeoutModalOpen}
           name='taskBody'
           type='text'
           placeholder='Zadanie'
-          required
           maxLength={100}
+          required
           value={taskBodyValue}
           ref={ref}
           onChange={(e) => handleUserInput(e)}
@@ -77,6 +80,7 @@ const TaskForm = React.forwardRef(
         )}
         <FormParagraph>Planowana data zakończenia</FormParagraph>
         <FormInput
+          disabled={isLogoutTimeoutModalOpen}
           id='date'
           name='taskFinishDate'
           type='date'
@@ -90,7 +94,9 @@ const TaskForm = React.forwardRef(
           <p>Priorytet zadania</p>
           <ul>{generatePriorityStars()}</ul>
         </Priorities>
-        <button type='submit'>Dodaj zadanie</button>
+        <button type='submit' disabled={isLogoutTimeoutModalOpen}>
+          Dodaj zadanie
+        </button>
       </Form>
     );
   }
