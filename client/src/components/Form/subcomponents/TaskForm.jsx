@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 
+import { useSelector } from 'react-redux';
+
 import {
   Form,
   FormInput,
@@ -12,25 +14,36 @@ import {
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import { LoadingSpinner } from '../styles/StyledForm';
+
 const TaskForm = React.forwardRef(
   (
     {
+      addTaskForm,
+      editTaskForm,
       formErrors,
       formWarnings,
       handleErrorInformation,
       handleUserInput,
       handleSubmitForm,
-      isLogoutTimeoutModalOpen,
+      loadingAddTask,
+      loadingEditTask,
       taskBodyValue,
       taskFinishDateValue,
       taskPriorityValue,
-      setFormKind,
+      setFormType,
     },
     ref
   ) => {
+    const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
+
     useEffect(() => {
-      setFormKind('addTaskForm');
-    }, [setFormKind]);
+      if (addTaskForm) {
+        setFormType('addTaskForm');
+      } else if (editTaskForm) {
+        setFormType('editTaskForm');
+      }
+    }, [addTaskForm, editTaskForm, setFormType]);
 
     const generatePriorityStars = () => {
       let stars = [];
@@ -42,6 +55,7 @@ const TaskForm = React.forwardRef(
         priorityStars.push(
           <Priority key={i} amount={i}>
             <input
+              checked={i === parseInt(taskPriorityValue, 10)}
               disabled={isLogoutTimeoutModalOpen}
               id={i}
               name='taskPriority'
@@ -56,6 +70,13 @@ const TaskForm = React.forwardRef(
       return priorityStars;
     };
 
+    const handleMinDateInput = () => {
+      const date = new Date().toISOString().split('.')[0];
+      return date.substring(0, date.length - 3);
+    };
+
+    handleMinDateInput();
+
     return (
       <Form onSubmit={handleSubmitForm}>
         {handleErrorInformation()}
@@ -63,9 +84,9 @@ const TaskForm = React.forwardRef(
         <FormTextArea
           disabled={isLogoutTimeoutModalOpen}
           name='taskBody'
+          maxLength={100}
           type='text'
           placeholder='Zadanie'
-          maxLength={100}
           required
           value={taskBodyValue}
           ref={ref}
@@ -82,8 +103,9 @@ const TaskForm = React.forwardRef(
         <FormInput
           disabled={isLogoutTimeoutModalOpen}
           id='date'
+          min={handleMinDateInput()}
           name='taskFinishDate'
-          type='date'
+          type='datetime-local'
           value={taskFinishDateValue}
           onChange={(e) => handleUserInput(e)}
         />
@@ -92,10 +114,27 @@ const TaskForm = React.forwardRef(
             <FormParagraph error={true}>{formErrors.taskPriority}</FormParagraph>
           )}
           <p>Priorytet zadania</p>
-          <ul>{generatePriorityStars()}</ul>
+          <ul>
+            {editTaskForm && (
+              <Priority>
+                <input
+                  disabled={isLogoutTimeoutModalOpen}
+                  id={0}
+                  name='taskPriority'
+                  type='radio'
+                  value={taskPriorityValue}
+                  onChange={(e) => handleUserInput(e)}
+                />
+                <label htmlFor={0}>Brak</label>
+              </Priority>
+            )}
+
+            {generatePriorityStars()}
+          </ul>
         </Priorities>
-        <button type='submit' disabled={isLogoutTimeoutModalOpen}>
-          Dodaj zadanie
+        <button disabled={isLogoutTimeoutModalOpen || loadingAddTask} type='submit'>
+          {addTaskForm ? 'Dodaj' : 'Edytuj'} zadanie
+          {(loadingAddTask || loadingEditTask) && <LoadingSpinner />}
         </button>
       </Form>
     );

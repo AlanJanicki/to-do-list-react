@@ -19,6 +19,7 @@ export const ControlPanelWrapper = styled.div`
   justify-content: space-between;
   flex-wrap: wrap;
   width: 90%;
+  padding-bottom: 10px;
 
   @media (min-width: 375px) {
     width: 88%;
@@ -49,7 +50,7 @@ export const Welcome = styled.div`
     width: 48px;
     height: 54px;
     background-image: url(${avatars});
-    background-position: 0px 0px;
+    background-position: ${(props) => `${-(props.avatar * 48)}px 0px`};
     background-size: cover;
   }
 `;
@@ -74,25 +75,79 @@ export const Controls = styled.div`
       }
     }
 
-    @media (hover: hover) {
-      &:hover p {
-        color: #ee7300;
-        text-decoration: underline;
-      }
-    }
-
     &:nth-of-type(1) {
       color: #00b044;
     }
 
     &:nth-of-type(2) {
-      color: #eb4b57;
+      color: ${(props) =>
+        props.loadingDeleteTasks ||
+        props.isModalOpen ||
+        props.isLogoutTimeoutModalOpen ||
+        props.checkedTasks.length === 0
+          ? '#919191'
+          : '#eb4b57'};
+      animation: ${(props) => props.loadingDeleteTasks && 'shake 1s infinite'};
     }
+
     &:nth-of-type(3) {
-      color: #43537e;
+      color: ${(props) =>
+        props.isModalOpen ||
+        props.isLogoutTimeoutModalOpen ||
+        props.checkedTasks.length === 0 ||
+        props.checkedTasks.length > 1
+          ? '#919191'
+          : '#43537e'};
     }
+
     &:nth-of-type(4) {
-      color: #2f4858;
+      color: ${(props) => (props.tasksList.length > 0 ? '#2f4858' : '#919191')};
+    }
+
+    @media (hover: hover) {
+      &:hover p {
+        color: #ee7300;
+        text-decoration: underline;
+      }
+
+      &:nth-of-type(2):hover p {
+        color: ${(props) =>
+          !props.isModalOpen &&
+          !props.isLogoutTimeoutModalOpen &&
+          props.checkedTasks.length > 0 &&
+          !props.loadingDeleteTasks
+            ? '#ee7300'
+            : '#919191'};
+        text-decoration: ${(props) =>
+          !props.isModalOpen &&
+          !props.isLogoutTimeoutModalOpen &&
+          props.checkedTasks.length > 0 &&
+          !props.loadingDeleteTasks
+            ? 'underline'
+            : 'none'};
+      }
+
+      &:nth-of-type(3):hover p {
+        color: ${(props) =>
+          !props.isModalOpen &&
+          !props.isLogoutTimeoutModalOpen &&
+          props.checkedTasks.length > 0 &&
+          props.checkedTasks.length < 2
+            ? '#ee7300'
+            : '#919191'};
+        text-decoration: ${(props) =>
+          !props.isModalOpen &&
+          !props.isLogoutTimeoutModalOpen &&
+          props.checkedTasks.length > 0 &&
+          props.checkedTasks.length < 2
+            ? 'underline'
+            : 'none'};
+      }
+
+      &:nth-of-type(4):hover p {
+        color: ${(props) => (props.tasksList.length > 0 ? '#ee7300' : '#919191')};
+        text-decoration: ${(props) => (props.tasksList.length > 0 ? 'underline' : 'none')};
+      }
     }
 
     &:focus {
@@ -105,6 +160,29 @@ export const Controls = styled.div`
 
     &:focus-visible {
       outline: 1px solid #ee7300;
+    }
+
+    @keyframes shake {
+      10%,
+      90% {
+        transform: translate3d(-1px, 0, 0);
+      }
+
+      20%,
+      80% {
+        transform: translate3d(2px, 0, 0);
+      }
+
+      30%,
+      50%,
+      70% {
+        transform: translate3d(-4px, 0, 0);
+      }
+
+      40%,
+      60% {
+        transform: translate3d(4px, 0, 0);
+      }
     }
   }
 `;
@@ -122,6 +200,7 @@ export const Manage = styled.div`
     border: 1px dotted #4b4b4b;
     border-radius: 5px;
     color: #000;
+    cursor: pointer;
     background-color: #fff;
     text-align: center;
 
@@ -173,7 +252,7 @@ export const Manage = styled.div`
         return 'space-evenly';
       }
     }};
-    padding: 10px 0;
+    padding-bottom: 10px;
   }
 `;
 

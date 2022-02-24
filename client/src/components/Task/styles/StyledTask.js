@@ -38,47 +38,13 @@ export const TaskWrapper = styled.li`
     }
   }
 
-  button {
-    border: none;
-    color: ${(props) => (props.done ? '#00b044' : '#919191')};
-    background: none;
-    font-size: 1.2rem;
-    transition: color 0.3s ease;
-    cursor: pointer;
-
-    &:focus {
-      outline: 1px solid #ee7300;
-    }
-
-    &:focus:not(:focus-visible) {
-      outline: 0;
-    }
-
-    &:focus-visible {
-      outline: 1px solid #ee7300;
-    }
-
-    @media (hover: hover) {
-      &:hover {
-        color: ${(props) => (props.done ? '#919191' : '#00b044')};
-      }
-    }
-
-    @media (min-width: 576px) {
-      margin-right: 10px;
-    }
-
-    @media (min-width: 992px) {
-      margin-right: 20px;
-    }
-  }
-
   h3 {
     color: ${(props) => props.done && '#919191'};
     text-align: center;
     text-decoration: ${(props) => props.done && 'line-through'};
     text-decoration-thickness: 1px;
-    transition: color 0.3s ease, text-decoration 0.3s ease;
+    transition: color 0.3s ease;
+    white-space: pre-wrap;
 
     @media (min-width: 576px) {
       margin-right: auto;
@@ -103,7 +69,7 @@ export const TaskWrapper = styled.li`
       font-weight: 400;
       text-decoration: ${(props) => props.done && 'line-through'};
       text-decoration-thickness: 1px;
-      transition: color 0.3s ease, text-decoration 0.3s ease;
+      transition: color 0.3s ease;
 
       @media (min-width: 992px) {
         font-size: 1rem;
@@ -111,7 +77,7 @@ export const TaskWrapper = styled.li`
     }
 
     h4 {
-      text-decoration: underline;
+      text-decoration: ${(props) => (props.done ? 'underline line-through' : 'underline')};
     }
 
     @media (min-width: 576px) {
@@ -133,6 +99,83 @@ export const TaskWrapper = styled.li`
     margin-bottom: 25px;
     padding-bottom: 25px;
     row-gap: 15px;
+  }
+`;
+
+export const TaskDoneButton = styled.button`
+  border: none;
+  color: ${(props) => (props.done ? '#00b044' : '#919191')};
+  background: none;
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+  cursor: pointer;
+  animation: ${(props) => props.loadingToggleTaskDone && 'shake 1s infinite'};
+
+  &:focus {
+    outline: 1px solid #ee7300;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: 0;
+  }
+
+  &:focus-visible {
+    outline: 1px solid #ee7300;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      color: ${(props) => (props.done ? '#919191' : '#00b044')};
+    }
+  }
+
+  @media (min-width: 576px) {
+    margin-right: 10px;
+  }
+
+  @media (min-width: 992px) {
+    margin-right: 20px;
+  }
+
+  @keyframes shake {
+    10%,
+    90% {
+      transform: translate3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+      transform: translate3d(2px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+      transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+      transform: translate3d(4px, 0, 0);
+    }
+  }
+`;
+
+export const TaskDate = styled.h4`
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+
+  @media (min-width: 576px) {
+    flex-basis: 100%;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    font-size: 1.4rem;
+  }
+
+  @media (min-width: 992px) {
+    font-size: 1.8rem;
   }
 `;
 
@@ -159,9 +202,10 @@ export const PriorityStarsList = styled.ul`
   li:first-child {
     margin-right: 15px;
     padding: 2px;
-    border: 1px solid #4c8077;
+    border: ${(props) =>
+      props.tasksSortType === 'own' ? '1px solid #4c8077' : '1px solid #919191'};
     border-radius: 5px;
-    color: #4c8077;
+    color: ${(props) => (props.tasksSortType === 'own' ? '#4c8077' : '#919191')};
     font-size: 0.9rem;
     cursor: pointer;
 
@@ -180,12 +224,12 @@ export const PriorityStarsList = styled.ul`
     }
 
     &:active {
-      border: 3px solid #4c8077;
+      border: ${(props) => props.tasksSortType === 'own' && '3px solid #4c8077'};
     }
 
     @media (hover: hover) {
       &:hover {
-        border: 3px solid #4c8077;
+        border: ${(props) => props.tasksSortType === 'own' && '3px solid #4c8077'};
       }
     }
   }

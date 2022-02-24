@@ -3,8 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 import { lockBodyScroll, unlockBodyScroll } from '../utils/bodyScrollLock';
 
 const initialState = {
-  isLogoutTimeoutModalOpen: null,
-  isModalOpen: null,
+  isLogoutTimeoutModalOpen: false,
+  isModalOpen: false,
   windowScrollY: 0,
 };
 

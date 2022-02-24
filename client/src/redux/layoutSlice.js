@@ -11,6 +11,12 @@ export const layoutSlice = createSlice({
   name: 'layout',
   initialState,
   reducers: {
+    closeAccountMenu: (state) => {
+      state.isAccountMenuOpen = false;
+    },
+    openAccountMenu: (state) => {
+      state.isAccountMenuOpen = true;
+    },
     setAccountMenuHeight: (state, action) => {
       state.accountMenuHeight = action.payload;
     },
@@ -19,12 +25,6 @@ export const layoutSlice = createSlice({
     },
     setHeaderHeight: (state, action) => {
       state.headerHeight = action.payload;
-    },
-    closeAccountMenu: (state) => {
-      state.isAccountMenuOpen = false;
-    },
-    openAccountMenu: (state) => {
-      state.isAccountMenuOpen = true;
     },
     toggleAccountMenu: (state) => {
       state.isAccountMenuOpen = !state.isAccountMenuOpen;

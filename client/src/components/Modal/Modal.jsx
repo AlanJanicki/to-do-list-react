@@ -2,11 +2,18 @@ import { useEffect } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { closeLogoutTimeoutModal } from '../../redux/modalSlice';
-import { removeUserAutoLoggedOut } from '../../redux/authSlice';
+import { setUserAutoLoggedOut } from '../../redux/authSlice';
 
 import { CloseButton, ModalContent, ModalWrapper } from './styles/StyledModal';
 
-const Modal = ({ children, handleCloseModal, lastActiveElement, logoutTimeoutModal }) => {
+const Modal = ({
+  children,
+  handleAutoLogout,
+  handleCloseModal,
+  isUserInactive,
+  lastActiveElement,
+  logoutTimeoutModal,
+}) => {
   const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
   const isModalOpen = useSelector((state) => state.modal.isModalOpen);
   const isUserAutoLoggedOut = useSelector((state) => state.auth.isUserAutoLoggedOut);
@@ -20,27 +27,29 @@ const Modal = ({ children, handleCloseModal, lastActiveElement, logoutTimeoutMod
         if (e.code === 'Escape') {
           handleCloseModal();
         }
-      }
-
-      if (lastActiveElement) {
+      } else if (isLogoutTimeoutModalOpen && lastActiveElement) {
         if (e.code === 'Escape') {
-          dispatch(closeLogoutTimeoutModal());
-          lastActiveElement.focus();
-          if (isUserAutoLoggedOut) {
+          if (isUserInactive) {
+            handleAutoLogout();
+          } else {
+            dispatch(closeLogoutTimeoutModal());
+            if (lastActiveElement.current) {
+              lastActiveElement.current.focus();
+            }
             setTimeout(() => {
-              dispatch(removeUserAutoLoggedOut());
+              dispatch(setUserAutoLoggedOut(false));
             }, 500);
           }
         }
-      }
 
-      if (isUserTokenExpired) {
-        if (e.code === 'Escape') {
-          dispatch(closeLogoutTimeoutModal());
-          if (isUserAutoLoggedOut) {
-            setTimeout(() => {
-              dispatch(removeUserAutoLoggedOut());
-            }, 500);
+        if (isUserTokenExpired) {
+          if (e.code === 'Escape') {
+            dispatch(closeLogoutTimeoutModal());
+            if (isUserAutoLoggedOut) {
+              setTimeout(() => {
+                dispatch(setUserAutoLoggedOut(false));
+              }, 500);
+            }
           }
         }
       }
@@ -53,9 +62,11 @@ const Modal = ({ children, handleCloseModal, lastActiveElement, logoutTimeoutMod
     };
   }, [
     dispatch,
+    handleAutoLogout,
     handleCloseModal,
     isLogoutTimeoutModalOpen,
     isUserAutoLoggedOut,
+    isUserInactive,
     isUserTokenExpired,
     lastActiveElement,
     logoutTimeoutModal,
@@ -63,16 +74,16 @@ const Modal = ({ children, handleCloseModal, lastActiveElement, logoutTimeoutMod
 
   const handleCloseLogoutTimeoutModal = (e) => {
     e.preventDefault();
-    dispatch(closeLogoutTimeoutModal());
 
-    if (lastActiveElement) {
+    if (isUserInactive) {
+      handleAutoLogout();
+    } else if (lastActiveElement) {
+      if (lastActiveElement.current) {
+        lastActiveElement.current.focus();
+      }
+      dispatch(closeLogoutTimeoutModal());
       setTimeout(() => {
-        lastActiveElement.focus();
-      }, 100);
-    }
-    if (isUserAutoLoggedOut) {
-      setTimeout(() => {
-        dispatch(removeUserAutoLoggedOut());
+        dispatch(setUserAutoLoggedOut(false));
       }, 500);
     }
   };

@@ -13,12 +13,11 @@ const Avatars = React.forwardRef(({ avatarValue, handleUserInput }, ref) => {
     const offsetValue = 80;
     let offset = 0;
 
-    for (let i = 1; i < 9; i++) {
-      offset -= offsetValue;
+    for (let i = 0; i < 8; i++) {
       avatars.push(
         <Avatar key={i} offset={offset}>
           <label htmlFor={i}></label>
-          {i === 1 ? (
+          {i === 0 ? (
             <input
               disabled={isLogoutTimeoutModalOpen}
               id={i}
@@ -42,6 +41,7 @@ const Avatars = React.forwardRef(({ avatarValue, handleUserInput }, ref) => {
           )}
         </Avatar>
       );
+      offset -= offsetValue;
     }
     return avatars;
   };

@@ -22,14 +22,6 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    checkUserTokenValidity: (state) => {
-      const decodedToken = jwt_decode(state.user.token);
-      if (decodedToken.exp * 1000 > Date.now()) {
-        state.isUserTokenExpired = false;
-      } else {
-        state.isUserTokenExpired = true;
-      }
-    },
     decrementAutoLogoutCounter: (state) => {
       state.autoLogoutCounter = state.autoLogoutCounter - 1;
     },
@@ -37,19 +29,19 @@ export const authSlice = createSlice({
       state.user = null;
       localStorage.removeItem('jwt');
     },
-    removeUserAutoLoggedOut: (state) => {
-      state.isUserAutoLoggedOut = false;
-    },
     resetAutoLogoutCounter: (state) => {
       state.autoLogoutCounter = 10;
+    },
+    setIsUserTokenExpired: (state, action) => {
+      state.isUserTokenExpired = action.payload;
     },
     setUser: (state, action) => {
       state.user = action.payload;
       localStorage.setItem('jwt', state.user.token);
       state.isUserTokenExpired = false;
     },
-    setUserAutoLoggedOut: (state) => {
-      state.isUserAutoLoggedOut = true;
+    setUserAutoLoggedOut: (state, action) => {
+      state.isUserAutoLoggedOut = action.payload;
     },
   },
 });
@@ -57,8 +49,8 @@ export const authSlice = createSlice({
 export const {
   decrementAutoLogoutCounter,
   removeUser,
-  removeUserAutoLoggedOut,
   resetAutoLogoutCounter,
+  setIsUserTokenExpired,
   setUser,
   setUserAutoLoggedOut,
 } = authSlice.actions;

@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 
+import { useSelector } from 'react-redux';
+
 import { Form, FormInput, FormParagraph } from '../styles/StyledForm';
+import { LoadingSpinner } from '../styles/StyledForm';
 
 import SuccessInfo from './SuccessInfo';
 
@@ -13,17 +16,19 @@ const PasswordForm = React.forwardRef(
       handleErrorInformation,
       handleUserInput,
       handleSubmitForm,
-      isLogoutTimeoutModalOpen,
+      loading,
       newPasswordValue,
       newPasswordValueRepeated,
       oldPasswordValue,
-      setFormKind,
+      setFormType,
     },
     ref
   ) => {
+    const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
+
     useEffect(() => {
-      setFormKind('passwordForm');
-    }, [setFormKind]);
+      setFormType('passwordForm');
+    }, [setFormType]);
 
     return (
       <>
@@ -37,10 +42,10 @@ const PasswordForm = React.forwardRef(
             )}
             <FormInput
               disabled={isLogoutTimeoutModalOpen}
+              maxLength={20}
               name='oldPassword'
               type='password'
               placeholder='Stare hasło'
-              maxLength={20}
               required
               value={oldPasswordValue}
               ref={ref}
@@ -55,10 +60,10 @@ const PasswordForm = React.forwardRef(
             )}
             <FormInput
               disabled={isLogoutTimeoutModalOpen}
+              maxLength={20}
               name='newPassword'
               type='password'
               placeholder='Nowe hasło'
-              maxLength={20}
               required
               value={newPasswordValue}
               onChange={(e) => handleUserInput(e)}
@@ -66,7 +71,7 @@ const PasswordForm = React.forwardRef(
             {newPasswordValue.length === 0 && (
               <FormParagraph warning={true}>
                 Wskazówka bezpieczeństwa: proszę użyć hasła, które nie jest używane w innych
-                serwisach.
+                serwisach
               </FormParagraph>
             )}
             {formWarnings.newPassword && (
@@ -78,17 +83,17 @@ const PasswordForm = React.forwardRef(
             )}
             <FormInput
               disabled={isLogoutTimeoutModalOpen}
+              maxLength={20}
               name='passwordRepeated'
               type='password'
               placeholder='Powtórz hasło'
-              maxLength={20}
               required
               value={newPasswordValueRepeated}
               onChange={(e) => handleUserInput(e)}
             />
 
-            <button disabled={isLogoutTimeoutModalOpen} type='submit'>
-              Zatwierdź
+            <button disabled={isLogoutTimeoutModalOpen || loading} type='submit'>
+              Zatwierdź {loading && <LoadingSpinner />}
             </button>
           </Form>
         )}

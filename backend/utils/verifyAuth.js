@@ -12,12 +12,24 @@ const verifyAuth = (context) => {
         const user = jwt.verify(token, JSONWT_KEY);
         return user;
       } catch (err) {
-        throw new AuthenticationError('Nieprawidłowy/nieaktualny token');
+        throw new AuthenticationError('', {
+          errors: {
+            uncategorizedErrors: 'Nieprawidłowy/nieaktualny token',
+          },
+        });
       }
     }
-    throw new Error('Nie odnaleziono tokenu w formacie "Bearer <token>"');
+    throw new AuthenticationError('', {
+      errors: {
+        uncategorizedErrors: 'Nie odnaleziono tokenu w formacie "Bearer <token>',
+      },
+    });
   }
-  throw new Error('Nie odnaleziono nagłówka autoryzacyjnego');
+  throw new AuthenticationError('', {
+    errors: {
+      uncategorizedErrors: 'Nie odnaleziono nagłówka autoryzacyjnego',
+    },
+  });
 };
 
 export default verifyAuth;

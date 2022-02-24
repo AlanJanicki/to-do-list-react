@@ -13,6 +13,7 @@ import {
   closeModal,
   openLogoutTimeoutModal,
 } from '../../redux/modalSlice';
+import { resetTasksList } from '../../redux/tasksListSlice';
 
 import { debounce } from '../../utils/debounce';
 
@@ -22,9 +23,9 @@ import LogoutTimer from './subcomponents/LogoutTimer/LogoutTimer';
 const AutoLogoutHandler = () => {
   const [isUserInactive, setIsUserInactive] = useState(false);
 
+  const autoLogoutCounter = useSelector((state) => state.auth.autoLogoutCounter);
   const isUserAutoLoggedOut = useSelector((state) => state.auth.isUserAutoLoggedOut);
   const isUserTokenExpired = useSelector((state) => state.auth.isUserTokenExpired);
-  const logoutCounter = useSelector((state) => state.auth.autoLogoutCounter);
   const user = useSelector((state) => state.auth.user);
 
   const inactivityTimeout = useRef(null);
@@ -44,9 +45,11 @@ const AutoLogoutHandler = () => {
     dispatch(closeLogoutTimeoutModal());
     dispatch(openLogoutTimeoutModal('resetWindowScrollY'));
     clearInterval(timer.current);
+    clearTimeout(logoutTimeout.current);
     dispatch(removeUser());
     dispatch(resetAutoLogoutCounter());
-    dispatch(setUserAutoLoggedOut());
+    dispatch(setUserAutoLoggedOut(true));
+    dispatch(resetTasksList());
     setIsUserInactive(false);
     inactivityTimeout.current = null;
     logoutTimeout.current = null;
@@ -55,7 +58,9 @@ const AutoLogoutHandler = () => {
   const handleStartLogoutTimeout = useCallback(() => {
     dispatch(openLogoutTimeoutModal());
     setTimeout(() => {
-      resetButton.current.focus();
+      if (resetButton.current) {
+        resetButton.current.focus();
+      }
     }, 100);
     timer.current = setInterval(() => {
       dispatch(decrementAutoLogoutCounter());
@@ -114,7 +119,9 @@ const AutoLogoutHandler = () => {
       clearInterval(timer.current);
       clearTimeout(inactivityTimeout.current);
       clearTimeout(logoutTimeout.current);
-      dispatch(resetAutoLogoutCounter());
+      if (autoLogoutCounter !== 10) {
+        dispatch(resetAutoLogoutCounter());
+      }
       setIsUserInactive(false);
       inactivityTimeout.current = null;
       logoutTimeout.current = null;
@@ -126,7 +133,7 @@ const AutoLogoutHandler = () => {
       window.removeEventListener('scroll', handleUserActivity);
       window.removeEventListener('mousemove', handleUserActivity);
     };
-  }, [user, dispatch, handleUserActivity]);
+  }, [autoLogoutCounter, user, dispatch, handleUserActivity]);
 
   useEffect(() => {
     if (isUserInactive) {
@@ -144,16 +151,20 @@ const AutoLogoutHandler = () => {
   return (
     <>
       {(user || isUserAutoLoggedOut) && (
-        <Modal lastActiveElement={lastActiveElement.current} logoutTimeoutModal={true}>
+        <Modal
+          isUserInactive={isUserInactive}
+          lastActiveElement={lastActiveElement}
+          logoutTimeoutModal={true}
+          handleAutoLogout={handleAutoLogout}>
           <LogoutTimer isUserAutoLoggedOut={isUserAutoLoggedOut}>
             {isUserAutoLoggedOut && !isUserTokenExpired
-              ? 'Nastąpiło automatyczne wylogowanie z powodu braku aktywności'
+              ? 'Nastąpiło automatyczne wylogowanie z powodu zbyt długiego czasu bez aktywności'
               : !isUserTokenExpired &&
                 isUserInactive &&
-                `Automatyczne wylogowanie z powodu braku aktywności nastapi za: ${logoutCounter}s`}
+                `Automatyczne wylogowanie z powodu braku aktywności nastapi za: ${autoLogoutCounter}s`}
             {isUserAutoLoggedOut &&
               isUserTokenExpired &&
-              'Nastąpiło automatyczne wylogowanie z powodu wygaśnięcia ważności tokena'}
+              'Nastąpiło automatyczne wylogowanie z powodu wygaśnięcia ważności tokena autoryzacyjnego'}
             {!isUserAutoLoggedOut && isUserInactive && (
               <button ref={resetButton} onClick={handleClickResetButton}>
                 Przedłuż sesję o 30min

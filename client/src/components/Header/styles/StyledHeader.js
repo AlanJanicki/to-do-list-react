@@ -54,7 +54,7 @@ export const Logo = styled.h1`
   }
 `;
 
-export const Search = styled.form`
+export const Search = styled.div`
   flex-basis: 60%;
   display: flex;
   align-items: center;

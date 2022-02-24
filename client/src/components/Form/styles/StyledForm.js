@@ -240,6 +240,7 @@ export const Priorities = styled.div`
   ul {
     margin-top: 10px;
     flex-basis: 100%;
+    flex-wrap: wrap;
     display: flex;
     list-style: none;
   }
@@ -252,6 +253,7 @@ export const Priority = styled.li`
   align-items: center;
   column-gap: 10px;
   padding: 5px 0;
+  cursor: pointer;
 
   label {
     color: ${(props) => {
@@ -263,6 +265,11 @@ export const Priority = styled.li`
         return '#ee7300';
       }
     }};
+    cursor: pointer;
+  }
+
+  input {
+    cursor: pointer;
   }
 `;
 
@@ -280,6 +287,10 @@ export const ClearTasksListFormWrapper = styled.div`
     font-size: 1.2rem;
     font-weight: bold;
     text-align: center;
+
+    &:nth-of-type(2) {
+      text-decoration: underline;
+    }
   }
 
   button {
@@ -294,7 +305,7 @@ export const ClearTasksListFormWrapper = styled.div`
 `;
 
 export const LoadingSpinner = styled.span`
-  display: inline-block;
+  display: block;
   width: 20px;
   height: 20px;
   border: 3px solid rgba(255, 255, 255, 0.3);

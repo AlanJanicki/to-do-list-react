@@ -1,36 +1,49 @@
 import React, { useEffect } from 'react';
 
+import { useSelector } from 'react-redux';
+
 import { Form, FormParagraph } from '../styles/StyledForm';
+import { LoadingSpinner } from '../styles/StyledForm';
 
 import Avatars from './Avatars';
+import SuccessInfo from './SuccessInfo';
 
 const AvatarsForm = React.forwardRef(
   (
     {
       avatarValue,
       formErrors,
+      formSentSuccessfully,
       handleErrorInformation,
       handleSubmitForm,
       handleUserInput,
-      isLogoutTimeoutModalOpen,
-      setFormKind,
+      loading,
+      setFormType,
     },
     ref
   ) => {
+    const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
+
     useEffect(() => {
-      setFormKind('avatarsForm');
-    }, [setFormKind]);
+      setFormType('avatarsForm');
+    }, [setFormType]);
 
     return (
-      <Form onSubmit={handleSubmitForm}>
-        {handleErrorInformation()}
-        {formErrors.avatar && <FormParagraph error={true}>{formErrors.avatar}</FormParagraph>}
-        <Avatars avatarValue={avatarValue} ref={ref} handleUserInput={handleUserInput} />
+      <>
+        {formSentSuccessfully ? (
+          <SuccessInfo>Avatar został zmieniony</SuccessInfo>
+        ) : (
+          <Form onSubmit={handleSubmitForm}>
+            {handleErrorInformation()}
+            {formErrors.avatar && <FormParagraph error={true}>{formErrors.avatar}</FormParagraph>}
+            <Avatars avatarValue={avatarValue} ref={ref} handleUserInput={handleUserInput} />
 
-        <button type='submit' disabled={isLogoutTimeoutModalOpen}>
-          Wybierz
-        </button>
-      </Form>
+            <button disabled={isLogoutTimeoutModalOpen || loading} type='submit'>
+              Wybierz {loading && <LoadingSpinner />}
+            </button>
+          </Form>
+        )}
+      </>
     );
   }
 );

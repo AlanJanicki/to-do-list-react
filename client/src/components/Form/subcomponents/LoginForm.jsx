@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 
+import { useSelector } from 'react-redux';
+
 import {
   Form,
   FormInput,
@@ -15,8 +17,6 @@ const LoginForm = React.forwardRef(
     {
       formErrors,
       formWarnings,
-      isModalOpen,
-      isLogoutTimeoutModalOpen,
       handleErrorInformation,
       handleOpenModal,
       handleSubmitForm,
@@ -24,19 +24,22 @@ const LoginForm = React.forwardRef(
       loading,
       loginValue,
       passwordValue,
-      setFormKind,
+      setFormType,
     },
     ref
   ) => {
+    const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
+    const isModalOpen = useSelector((state) => state.modal.isModalOpen);
+
     useEffect(() => {
       if (!isModalOpen) {
-        setFormKind('loginForm');
+        setFormType('loginForm');
       }
-    }, [isModalOpen, setFormKind]);
+    }, [isModalOpen, setFormType]);
 
     const handleOpenRegisterForm = (e) => {
       handleOpenModal(e);
-      setFormKind('registerForm');
+      setFormType('registerForm');
     };
 
     return (
@@ -49,9 +52,9 @@ const LoginForm = React.forwardRef(
             <FormInput
               disabled={isModalOpen || isLogoutTimeoutModalOpen}
               name='login'
+              maxLength={15}
               placeholder='Login'
               type='text'
-              maxLength={15}
               required
               value={loginValue}
               errorBorder={formErrors.login}
@@ -67,10 +70,10 @@ const LoginForm = React.forwardRef(
             )}
             <FormInput
               disabled={isModalOpen || isLogoutTimeoutModalOpen}
+              maxLength={20}
               name='password'
               placeholder='Hasło'
               type='password'
-              maxLength={20}
               required
               value={passwordValue}
               onChange={(e) => handleUserInput(e)}
@@ -79,12 +82,12 @@ const LoginForm = React.forwardRef(
               <FormParagraph warning={true}>{formWarnings.password}</FormParagraph>
             )}
 
-            <button disabled={isModalOpen || isLogoutTimeoutModalOpen} type='submit'>
+            <button disabled={isModalOpen || isLogoutTimeoutModalOpen || loading} type='submit'>
               Zaloguj się
               {loading && <LoadingSpinner />}
             </button>
             <button
-              disabled={isModalOpen || isLogoutTimeoutModalOpen}
+              disabled={isModalOpen || isLogoutTimeoutModalOpen || loading}
               onClick={(e) => handleOpenRegisterForm(e)}>
               Utwórz nowe konto
             </button>

@@ -4,7 +4,7 @@ export const ModalWrapper = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 999;
+  z-index: 10000;
   display: flex;
   overflow: auto;
   justify-content: center;

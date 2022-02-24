@@ -109,17 +109,13 @@ export const validateChangePasswordInput = (oldPassword, newPassword, newPasswor
   return errors;
 };
 
-export const validateTaskInput = (body, done, finishDate, priority) => {
+export const validateTaskInput = (body, finishDate, priority) => {
   const errors = [];
 
   if (typeof body !== 'string') {
     errors.push({ taskBody: 'Nieprawidłowy format zadania' });
   } else if (body.trim().length < 5) {
     errors.push({ taskBody: 'Zadanie musi posiadać min. 5 znaków' });
-  }
-
-  if (done && typeof done !== 'boolean') {
-    errors.push({ taskDone: 'Nieprawidłowy format statusu zadania' });
   }
 
   if (finishDate && typeof finishDate !== 'string') {

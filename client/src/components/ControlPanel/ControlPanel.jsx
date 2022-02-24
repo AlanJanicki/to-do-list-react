@@ -1,7 +1,18 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
+import { setIsUserTokenExpired } from '../../redux/authSlice';
 import { setControlPanelHeight } from '../../redux/layoutSlice';
+import {
+  removeCheckedTask,
+  setDisplayFilter,
+  setSortType,
+  setTasksListErrors,
+} from '../../redux/tasksListSlice';
+
+import { useMutation } from '@apollo/client';
+import { DELETE_TASKS } from '../../graphql/mutations/tasksList';
+import { GET_TASKS } from '../../graphql/queries/tasksList';
 
 import {
   faAngleDoubleDown,
@@ -13,6 +24,8 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import useWindowWidth from '../../hooks/useWindowWidth';
+
+import { checkUserTokenValidity } from '../../utils/checkUserTokenValidity';
 
 import {
   Controls,
@@ -34,9 +47,14 @@ const ControlPanel = () => {
   const [showDisplaySelect, setShowDisplaySelect] = useState(false);
   const [showSortSelect, setShowSortSelect] = useState(false);
 
+  const checkedTasks = useSelector((state) => state.tasksList.checkedTasks);
   const headerHeight = useSelector((state) => state.layout.headerHeight);
   const isModalOpen = useSelector((state) => state.modal.isModalOpen);
   const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
+  const tasksDisplayFilter = useSelector((state) => state.tasksList.displayFilter);
+  const tasksList = useSelector((state) => state.tasksList.tasksList);
+  const tasksSortType = useSelector((state) => state.tasksList.sortType);
+  const user = useSelector((state) => state.auth.user);
 
   const controlPanel = useRef(null);
 
@@ -44,11 +62,44 @@ const ControlPanel = () => {
 
   const windowWidth = useWindowWidth();
 
+  const [deleteTasks, { loading: loadingDeleteTasks }] = useMutation(DELETE_TASKS, {
+    onError(err) {
+      console.log(err);
+      if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
+        dispatch(setTasksListErrors(err.graphQLErrors[0].message));
+      } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
+        dispatch(setTasksListErrors([err.graphQLErrors[0].extensions.errors]));
+      }
+    },
+    refetchQueries: [GET_TASKS, 'Query'],
+  });
+
   useLayoutEffect(() => {
     dispatch(setControlPanelHeight(controlPanel.current.getBoundingClientRect().height));
-  }, [dispatch, showDisplaySelect, showSortSelect, windowWidth]);
+  }, [dispatch, showDisplaySelect, showSortSelect, tasksList, windowWidth]);
+
+  const handleUncheckFilteredTasks = useCallback(() => {
+    const checkedTasksIds = checkedTasks.map((task) => task.id);
+    const tasksIds = tasksList.map((task) => task.id);
+    checkedTasksIds.forEach((checkedTaskId) => {
+      if (tasksIds.some((taskId) => taskId === checkedTaskId)) {
+        return;
+      } else {
+        dispatch(removeCheckedTask(checkedTaskId));
+      }
+    });
+  }, [checkedTasks, dispatch, tasksList]);
+
+  useEffect(() => {
+    handleUncheckFilteredTasks();
+  }, [handleUncheckFilteredTasks]);
 
   const handleSelectOption = (e) => {
+    const isUserTokenExpired = checkUserTokenValidity();
+    if (isUserTokenExpired) {
+      dispatch(setIsUserTokenExpired(isUserTokenExpired));
+      return;
+    }
     setSelectedOption(e.currentTarget.getAttribute('data-option'));
   };
 
@@ -59,6 +110,11 @@ const ControlPanel = () => {
   };
 
   const handleToggleShowSortSelect = () => {
+    const isUserTokenExpired = checkUserTokenValidity();
+    if (isUserTokenExpired) {
+      dispatch(setIsUserTokenExpired(isUserTokenExpired));
+      return;
+    }
     if (!showSortSelect) {
       setShowSortSelect(true);
       setRunFadeOutSortSelectAnimation(false);
@@ -71,6 +127,11 @@ const ControlPanel = () => {
   };
 
   const handleToggleShowDisplaySelect = () => {
+    const isUserTokenExpired = checkUserTokenValidity();
+    if (isUserTokenExpired) {
+      dispatch(setIsUserTokenExpired(isUserTokenExpired));
+      return;
+    }
     if (!showDisplaySelect) {
       setShowDisplaySelect(true);
       setRunFadeOutDisplaySelectAnimation(false);
@@ -82,15 +143,42 @@ const ControlPanel = () => {
     }
   };
 
+  const handleDeleteTasks = () => {
+    const isUserTokenExpired = checkUserTokenValidity();
+    if (isUserTokenExpired) {
+      dispatch(setIsUserTokenExpired(isUserTokenExpired));
+      return;
+    }
+    const checkedTasksIds = checkedTasks.map((task) => task.id);
+    deleteTasks({
+      variables: {
+        input: checkedTasksIds,
+      },
+    });
+  };
+
+  const handleSortType = (e) => {
+    dispatch(setSortType(e.target.value));
+  };
+
+  const handleDisplayFilter = (e) => {
+    dispatch(setDisplayFilter(e.target.value));
+  };
+
   return (
     <>
       <Wrapper headerHeight={headerHeight} ref={controlPanel} showSortSelect={showSortSelect}>
         <ControlPanelWrapper>
-          <Welcome>
-            <h2>Witaj, Alan!</h2>
+          <Welcome avatar={user.avatar}>
+            <h2>Witaj, {user.name}</h2>
             <span></span>
           </Welcome>
-          <Controls>
+          <Controls
+            checkedTasks={checkedTasks}
+            isModalOpen={isModalOpen}
+            isLogoutTimeoutModalOpen={isLogoutTimeoutModalOpen}
+            loadingDeleteTasks={loadingDeleteTasks}
+            tasksList={tasksList}>
             <button
               data-option='addTask'
               disabled={isModalOpen || isLogoutTimeoutModalOpen}
@@ -101,21 +189,45 @@ const ControlPanel = () => {
             </button>
             <button
               data-option='removeTask'
-              disabled={isModalOpen || isLogoutTimeoutModalOpen}
-              title={'Usuń zadanie'}>
+              disabled={
+                isModalOpen ||
+                isLogoutTimeoutModalOpen ||
+                checkedTasks.length === 0 ||
+                loadingDeleteTasks
+              }
+              title={
+                'Usuń zadani' +
+                (checkedTasks.length > 1 && !isModalOpen && !isLogoutTimeoutModalOpen ? 'a' : 'e')
+              }
+              onClick={handleDeleteTasks}>
               <FontAwesomeIcon icon={faMinusCircle} />
-              {windowWidth > 660 && <p>Usuń zadanie</p>}
+              {windowWidth > 660 && (
+                <p>
+                  Usuń zadani
+                  {checkedTasks.length > 1 && !isModalOpen && !isLogoutTimeoutModalOpen ? 'a' : 'e'}
+                </p>
+              )}
             </button>
             <button
               data-option='editTask'
-              disabled={isModalOpen || isLogoutTimeoutModalOpen}
-              title={'Edytuj zadanie'}>
+              disabled={
+                isModalOpen ||
+                isLogoutTimeoutModalOpen ||
+                checkedTasks.length === 0 ||
+                checkedTasks.length > 1
+              }
+              title={
+                checkedTasks.length > 1 && !isModalOpen && !isLogoutTimeoutModalOpen
+                  ? 'Edytuj zadanie (max 1 naraz)'
+                  : 'Edytuj zadanie'
+              }
+              onClick={handleSelectOption}>
               <FontAwesomeIcon icon={faEdit} />
               {windowWidth > 660 && <p>Edytuj zadanie</p>}
             </button>
             <button
-              data-option='clearTasksList'
-              disabled={isModalOpen || isLogoutTimeoutModalOpen}
+              data-option='confirmFormTasksList'
+              disabled={isModalOpen || isLogoutTimeoutModalOpen || tasksList.length === 0}
               title={'Wyczyść listę'}
               onClick={handleSelectOption}>
               <FontAwesomeIcon icon={faTrashAlt} />
@@ -123,6 +235,7 @@ const ControlPanel = () => {
             </button>
           </Controls>
         </ControlPanelWrapper>
+
         <Manage showDisplaySelect={showDisplaySelect} showSortSelect={showSortSelect}>
           <ManageButton
             disabled={isModalOpen || isLogoutTimeoutModalOpen}
@@ -135,13 +248,16 @@ const ControlPanel = () => {
             </span>
           </ManageButton>
           <Sort
-            defaultValue='oldest'
             name='sort'
+            value={tasksSortType}
+            onChange={(e) => handleSortType(e)}
             runFadeOutSortSelectAnimation={runFadeOutSortSelectAnimation}
             showSortSelect={showSortSelect}>
             <option value='own'>Własna kolejność</option>
-            <option value='oldest'>Daty dodania (od najstarszych)</option>
-            <option value='newest'>Daty dodania (od najnowszych)</option>
+            <option value='oldestAdd'>Daty dodania (od najstarszych)</option>
+            <option value='newestAdd'>Daty dodania (od najnowszych)</option>
+            <option value='earliestFinish'>Daty zakończenia (od brak/najwcześniejszych)</option>
+            <option value='latestFinish'>Daty zakończenia (od najpóźniejszych)</option>
             <option value='A-Z'>Alfabetycznie (A-Z)</option>
             <option value='Z-A'>Alfabetycznie (Z-A)</option>
             <option value='highestPriority'>Priorytetu (od najważniejszego)</option>
@@ -152,29 +268,38 @@ const ControlPanel = () => {
             displaySelectButton={true}
             runFadeOutDisplaySelectAnimation={runFadeOutDisplaySelectAnimation}
             onClick={handleToggleShowDisplaySelect}>
-            Wyświetlaj zadania:
+            Wyświetlaj:
             <span>
               <FontAwesomeIcon icon={faAngleDoubleDown} />
             </span>
           </ManageButton>
           <Display
-            defaultValue='all'
             name='display'
+            value={tasksDisplayFilter}
+            onChange={(e) => handleDisplayFilter(e)}
             runFadeOutDisplaySelectAnimation={runFadeOutDisplaySelectAnimation}
             showDisplaySelect={showDisplaySelect}>
             <option value='all'>Wszystkie</option>
-            <option value='all'>Zrobione</option>
-            <option value='all'>Niezrobione</option>
+            <option value='done'>Zrobione</option>
+            <option value='undone'>Niezrobione</option>
           </Display>
         </Manage>
       </Wrapper>
       {selectedOption === 'addTask' && (
-        <Form isModalOpenOnInit={true} taskForm={true} disableForm={handleUnselectOption} />
+        <Form isModalOpenOnInit={true} addTaskForm={true} disableForm={handleUnselectOption} />
       )}
-      {selectedOption === 'clearTasksList' && (
+      {selectedOption === 'editTask' && (
+        <Form
+          editTaskData={checkedTasks}
+          isModalOpenOnInit={true}
+          editTaskForm={true}
+          disableForm={handleUnselectOption}
+        />
+      )}
+      {selectedOption === 'confirmFormTasksList' && (
         <Form
           isModalOpenOnInit={true}
-          clearTasksListForm={true}
+          confirmFormTasksList={true}
           disableForm={handleUnselectOption}
         />
       )}

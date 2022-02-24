@@ -3,10 +3,15 @@ import styled from 'styled-components';
 export const Menu = styled.ul`
   position: fixed;
   z-index: 1;
-  top: ${(props) =>
-    props.isAccountMenuOpen
-      ? `${props.headerHeight + props.controlPanelHeight}px`
-      : `-${props.headerHeight + props.controlPanelHeight}px`};
+  top: ${(props) => {
+    if (props.controlPanelHeight && props.headerHeight) {
+      return props.isAccountMenuOpen
+        ? `${props.headerHeight + props.controlPanelHeight}px`
+        : `-${props.headerHeight + props.controlPanelHeight}px`;
+    } else {
+      return '-1000px';
+    }
+  }};
   display: flex;
   flex-wrap: wrap;
   width: 100%;
@@ -24,7 +29,7 @@ export const Menu = styled.ul`
     font-weight: bold;
     text-align: center;
     cursor: pointer;
-    outline-offset: -4px;
+    outline-offset: -5px;
 
     &:focus {
       outline: 1px solid #fff;
@@ -49,7 +54,7 @@ export const Menu = styled.ul`
     }
 
     @media (min-width: 576px) {
-      flex-basis: 30%;
+      flex-basis: 25%;
       flex-grow: 1;
       padding: 20px 0;
     }

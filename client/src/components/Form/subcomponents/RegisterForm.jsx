@@ -32,10 +32,10 @@ const RegisterForm = React.forwardRef(
             {handleErrorInformation()}
             {formErrors.name && <FormParagraph error={true}>{formErrors.name}</FormParagraph>}
             <FormInput
+              maxLength={50}
               name='name'
               type='text'
               placeholder='Imię'
-              maxLength={50}
               required
               value={nameValue}
               ref={ref}
@@ -45,10 +45,10 @@ const RegisterForm = React.forwardRef(
 
             {formErrors.login && <FormParagraph error={true}>{formErrors.login}</FormParagraph>}
             <FormInput
+              maxLength={15}
               name='login'
               type='text'
               placeholder='Login'
-              maxLength={15}
               required
               value={loginValue}
               onChange={(e) => handleUserInput(e)}
@@ -61,10 +61,10 @@ const RegisterForm = React.forwardRef(
               <FormParagraph error={true}>{formErrors.password}</FormParagraph>
             )}
             <FormInput
+              maxLength={20}
               name='password'
               type='password'
               placeholder='Hasło'
-              maxLength={20}
               required
               value={passwordValue}
               onChange={(e) => handleUserInput(e)}
@@ -72,7 +72,7 @@ const RegisterForm = React.forwardRef(
             {passwordValue.length === 0 && (
               <FormParagraph warning={true}>
                 Wskazówka bezpieczeństwa: proszę użyć hasła, które nie jest używane w innych
-                serwisach.
+                serwisach
               </FormParagraph>
             )}
             {formWarnings.password && (
@@ -83,17 +83,19 @@ const RegisterForm = React.forwardRef(
               <FormParagraph error={true}>{formErrors.passwordRepeated}</FormParagraph>
             )}
             <FormInput
+              maxLength={20}
               name='passwordRepeated'
               type='password'
               placeholder='Powtórz hasło'
-              maxLength={20}
               required
               value={passwordRepeatedValue}
               onChange={(e) => handleUserInput(e)}
             />
             <Avatars avatarValue={avatarValue} handleUserInput={handleUserInput} />
 
-            <button type='submit'>Utwórz konto{loading && <LoadingSpinner />}</button>
+            <button disabled={loading} type='submit'>
+              Utwórz konto{loading && <LoadingSpinner />}
+            </button>
           </Form>
         )}
       </>

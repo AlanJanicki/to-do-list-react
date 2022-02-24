@@ -1,20 +1,31 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser } from '../../redux/authSlice';
+import { removeUser, setIsUserTokenExpired, setUser } from '../../redux/authSlice';
+import { closeAccountMenu } from '../../redux/layoutSlice';
 import { closeModal, openModal } from '../../redux/modalSlice';
+import { clearCheckedTasks, resetTasksList } from '../../redux/tasksListSlice';
 
 import { useNavigate } from 'react-router-dom';
 
 import { useMutation } from '@apollo/client';
-import { LOGIN_USER, REGISTER_USER } from '../../graphql/mutations/user';
+import { ADD_TASK, DELETE_ALL_TASKS, EDIT_TASK } from '../../graphql/mutations/tasksList';
+import {
+  DELETE_USER,
+  LOGIN_USER,
+  REGISTER_USER,
+  UPDATE_USER_AVATAR,
+  UPDATE_USER_PASSWORD,
+} from '../../graphql/mutations/user';
+import { GET_TASKS } from '../../graphql/queries/tasksList';
 
+import { checkUserTokenValidity } from '../../utils/checkUserTokenValidity';
 import { handleValidateInput } from '../../utils/formValidator';
 
 import { FormParagraph } from './styles/StyledForm';
 
 import AvatarsForm from './subcomponents/AvatarsForm';
-import ClearTasksListForm from './subcomponents/ClearTasksListForm';
+import ConfirmForm from './subcomponents/ConfirmForm';
 import LoginForm from './subcomponents/LoginForm';
 import Modal from '../Modal/Modal';
 import PasswordForm from './subcomponents/PasswordForm';
@@ -22,13 +33,16 @@ import RegisterForm from './subcomponents/RegisterForm';
 import TaskForm from './subcomponents/TaskForm';
 
 const Form = ({
+  addTaskForm,
   avatarsForm,
-  clearTasksListForm,
+  confirmFormAccount,
+  confirmFormTasksList,
   disableForm,
+  editTaskData,
+  editTaskForm,
   isModalOpenOnInit,
   loginForm,
   passwordForm,
-  taskForm,
 }) => {
   const initFormDataState = {
     avatar: '',
@@ -45,7 +59,7 @@ const Form = ({
   };
   const [formData, setFormData] = useState(initFormDataState);
   const [formErrors, setFormErrors] = useState(initFormDataState);
-  const [formKind, setFormKind] = useState(null);
+  const [formType, setFormType] = useState(null);
   const [formSentSuccessfully, setFormSentSuccessfully] = useState(false);
   const [formWarnings, setFormWarnings] = useState(initFormDataState);
 
@@ -62,49 +76,150 @@ const Form = ({
 
   let navigate = useNavigate();
 
-  const [loginUser, { data: dataLoginUser, loading: loadingLoginUser, reset: resetLoginUser }] =
-    useMutation(LOGIN_USER, {
-      update() {
-        handleFormSent();
-        resetLoginUser();
-      },
+  const [loginUser, { data: dataLoginUser, loading: loadingLoginUser }] = useMutation(LOGIN_USER, {
+    onError(err) {
+      console.log(err);
+      if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
+        handleSetErrors(err.graphQLErrors[0].message);
+      } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
+        handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+      }
+    },
+    update() {
+      handleFormSent();
+    },
+  });
+
+  const [registerUser, { loading: loadingRegisterUser }] = useMutation(REGISTER_USER, {
+    onError(err) {
+      console.log(err);
+      if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
+        handleSetErrors(err.graphQLErrors[0].message);
+      } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
+        handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+      }
+    },
+    update() {
+      handleFormSent();
+    },
+  });
+
+  const [updateUserPassword, { data: dataUpdateUserPassword, loading: loadingUpdateUserPassword }] =
+    useMutation(UPDATE_USER_PASSWORD, {
       onError(err) {
         console.log(err);
-        if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
+        if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
+          handleSetErrors(err.graphQLErrors[0].message);
+        } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
           handleSetErrors([err.graphQLErrors[0].extensions.errors]);
         }
-        resetLoginUser();
+      },
+      update() {
+        handleFormSent();
       },
     });
 
-  const [registerUser, { loading: loadingRegisterUser, reset: resetRegisterUser }] = useMutation(
-    REGISTER_USER,
-    {
-      update() {
-        handleFormSent();
-        resetRegisterUser();
-      },
+  const [updateUserAvatar, { data: dataUpdateUserAvatar, loading: loadingUpdateUserAvatar }] =
+    useMutation(UPDATE_USER_AVATAR, {
       onError(err) {
         console.log(err);
-        if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
+        if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
+          handleSetErrors(err.graphQLErrors[0].message);
+        } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
           handleSetErrors([err.graphQLErrors[0].extensions.errors]);
         }
-        resetRegisterUser();
       },
-    }
-  );
+      update() {
+        handleFormSent();
+      },
+    });
+
+  const [deleteUser, { loading: loadingDeleteUser }] = useMutation(DELETE_USER, {
+    onError(err) {
+      console.log(err);
+      if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
+        handleSetErrors(err.graphQLErrors[0].message);
+      } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
+        handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+      }
+    },
+    update() {
+      handleFormSent();
+    },
+  });
+
+  const [addTask, { loading: loadingAddTask }] = useMutation(ADD_TASK, {
+    onError(err) {
+      console.log(err);
+      if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
+        handleSetErrors(err.graphQLErrors[0].message);
+      } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
+        handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+      }
+    },
+    refetchQueries: [GET_TASKS, 'Query'],
+    update() {
+      handleFormSent();
+    },
+  });
+
+  const [editTask, { loading: loadingEditTask }] = useMutation(EDIT_TASK, {
+    onError(err) {
+      console.log(err);
+      if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
+        handleSetErrors(err.graphQLErrors[0].message);
+      } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
+        handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+      }
+    },
+    refetchQueries: [GET_TASKS, 'Query'],
+    update() {
+      handleFormSent();
+      dispatch(clearCheckedTasks());
+    },
+  });
+
+  const [deleteAllTasks, { loading: loadingDeleteAllTasks }] = useMutation(DELETE_ALL_TASKS, {
+    onError(err) {
+      console.log(err);
+      if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
+        handleSetErrors(err.graphQLErrors[0].message);
+      } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
+        handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+      }
+    },
+    update() {
+      handleFormSent();
+      dispatch(resetTasksList());
+    },
+  });
 
   useEffect(() => {
     if (dataLoginUser) {
       dispatch(setUser(dataLoginUser.login));
+    } else if (dataUpdateUserPassword) {
+      dispatch(setUser(dataUpdateUserPassword.updateUserPassword));
+    } else if (dataUpdateUserAvatar) {
+      dispatch(setUser(dataUpdateUserAvatar.updateUserAvatar));
     }
-  }, [dataLoginUser, dispatch]);
+  }, [dataLoginUser, dataUpdateUserAvatar, dataUpdateUserPassword, dispatch]);
 
   useEffect(() => {
     if (user) {
       navigate('/home');
     }
   }, [navigate, user]);
+
+  useEffect(() => {
+    if (editTaskData && editTaskData.length > 0) {
+      setFormData((prevState) => ({
+        ...prevState,
+        taskBody: editTaskData[0].body,
+        taskFinishDate: editTaskData[0].finishDate,
+        taskPriority: editTaskData[0].priority,
+      }));
+    }
+  }, [editTaskData]);
 
   useEffect(() => {
     if (isModalOpenOnInit) {
@@ -152,6 +267,13 @@ const Form = ({
     if (disableForm) {
       disableForm();
     }
+    if (formType === 'confirmFormAccount' && formSentSuccessfully) {
+      dispatch(closeAccountMenu());
+      setTimeout(() => {
+        dispatch(removeUser());
+        dispatch(resetTasksList());
+      }, 500);
+    }
     handleClearFormState([setFormData, setFormErrors, setFormWarnings]);
     checkWarningData.current = initFormDataState;
   };
@@ -174,13 +296,19 @@ const Form = ({
   const handleSubmitForm = (e) => {
     e.preventDefault();
     handleClearFormState([setFormErrors]);
+    if (formType !== 'loginForm' && formType !== 'registerForm') {
+      const isUserTokenExpired = checkUserTokenValidity();
+      if (isUserTokenExpired) {
+        dispatch(setIsUserTokenExpired(isUserTokenExpired));
+        return;
+      }
+    }
     const { errors } = handleValidateInput(formData);
     handleSetErrors(errors);
     if (errors.length === 0) {
-      if (formKind === 'loginForm') {
+      if (formType === 'loginForm') {
         loginUser({ variables: { login: formData.login, password: formData.password } });
-      }
-      if (formKind === 'registerForm') {
+      } else if (formType === 'registerForm') {
         registerUser({
           variables: {
             input: {
@@ -192,15 +320,57 @@ const Form = ({
             },
           },
         });
+      } else if (formType === 'passwordForm') {
+        updateUserPassword({
+          variables: {
+            input: {
+              oldPassword: formData.oldPassword,
+              newPassword: formData.newPassword,
+              newPasswordRepeated: formData.passwordRepeated,
+            },
+          },
+        });
+      } else if (formType === 'avatarsForm') {
+        updateUserAvatar({ variables: { avatar: formData.avatar } });
+      } else if (formType === 'confirmFormAccount') {
+        deleteUser();
+      } else if (formType === 'addTaskForm') {
+        addTask({
+          variables: {
+            input: {
+              body: formData.taskBody,
+              done: false,
+              finishDate: formData.taskFinishDate,
+              priority: formData.taskPriority,
+            },
+          },
+        });
+      } else if (formType === 'editTaskForm') {
+        editTask({
+          variables: {
+            input: {
+              body: formData.taskBody,
+              finishDate: formData.taskFinishDate,
+              priority: formData.taskPriority,
+            },
+            taskId: editTaskData[0].id,
+          },
+        });
+      } else if (formType === 'confirmFormTasksList') {
+        deleteAllTasks();
       }
     }
-    handleScrollModal();
+    setTimeout(() => {
+      handleScrollModal();
+    }, 1000);
   };
 
   const handleFormSent = () => {
     let shouldCloseModal = handleCloseModalOnSubmitForm();
     setFormSentSuccessfully(true);
-    handleClearFormState([setFormData, setFormErrors, setFormWarnings]);
+    if (formType !== 'confirmFormAccount') {
+      handleClearFormState([setFormData, setFormErrors, setFormWarnings]);
+    }
     checkWarningData.current = initFormDataState;
     if (shouldCloseModal) {
       handleCloseModal();
@@ -210,6 +380,14 @@ const Form = ({
   };
 
   const handleSetErrors = (errors) => {
+    if (typeof errors === 'string') {
+      setFormErrors((prevState) => ({
+        ...prevState,
+        uncategorizedErrors: 'Server error: ' + errors,
+      }));
+      return;
+    }
+
     errors.forEach((error) => {
       const inputName = Object.keys(error);
       const inputError = Object.values(error);
@@ -237,7 +415,7 @@ const Form = ({
         return (
           <>
             <FormParagraph error={true}>
-              W formularzu wykryto poniższe błędy, popraw je i spróbuj ponownie!
+              Wystąpiły poniższe błędy, popraw je i/lub spróbuj ponownie!
             </FormParagraph>
             {formErrors.uncategorizedErrors && (
               <FormParagraph error={true}>{formErrors.uncategorizedErrors}</FormParagraph>
@@ -253,7 +431,12 @@ const Form = ({
   };
 
   const handleCloseModalOnSubmitForm = () => {
-    if (formKind === 'passwordForm' || formKind === 'registerForm') {
+    if (
+      formType === 'passwordForm' ||
+      formType === 'registerForm' ||
+      formType === 'avatarsForm' ||
+      formType === 'confirmFormAccount'
+    ) {
       return false;
     } else {
       return true;
@@ -273,8 +456,6 @@ const Form = ({
           <LoginForm
             formErrors={formErrors}
             formWarnings={formWarnings}
-            isModalOpen={isModalOpen}
-            isLogoutTimeoutModalOpen={isLogoutTimeoutModalOpen}
             loading={loadingLoginUser}
             loginValue={formData.login}
             passwordValue={formData.password}
@@ -283,7 +464,7 @@ const Form = ({
             handleOpenModal={handleOpenModal}
             handleSubmitForm={handleSubmitForm}
             handleUserInput={handleUserInput}
-            setFormKind={setFormKind}
+            setFormType={setFormType}
           />
           <Modal handleCloseModal={handleCloseModal}>
             <RegisterForm
@@ -309,12 +490,13 @@ const Form = ({
           <AvatarsForm
             avatarValue={formData.avatar}
             formErrors={formErrors}
+            formSentSuccessfully={formSentSuccessfully}
+            loading={loadingUpdateUserAvatar}
             ref={modalElementToSetFocus}
             handleErrorInformation={handleErrorInformation}
             handleSubmitForm={handleSubmitForm}
             handleUserInput={handleUserInput}
-            isLogoutTimeoutModalOpen={isLogoutTimeoutModalOpen}
-            setFormKind={setFormKind}
+            setFormType={setFormType}
           />
         </Modal>
       )}
@@ -324,7 +506,7 @@ const Form = ({
             formErrors={formErrors}
             formSentSuccessfully={formSentSuccessfully}
             formWarnings={formWarnings}
-            isLogoutTimeoutModalOpen={isLogoutTimeoutModalOpen}
+            loading={loadingUpdateUserPassword}
             newPasswordValue={formData.newPassword}
             newPasswordValueRepeated={formData.newPasswordRepeated}
             oldPasswordValue={formData.oldPassword}
@@ -332,16 +514,20 @@ const Form = ({
             handleErrorInformation={handleErrorInformation}
             handleSubmitForm={handleSubmitForm}
             handleUserInput={handleUserInput}
-            setFormKind={setFormKind}
+            setFormType={setFormType}
           />
         </Modal>
       )}
-      {taskForm && (
+      {(addTaskForm || editTaskForm) && (
         <Modal handleCloseModal={handleCloseModal}>
           <TaskForm
+            addTaskForm={addTaskForm}
+            editTaskForm={editTaskForm}
             formErrors={formErrors}
             formWarnings={formWarnings}
-            isLogoutTimeoutModalOpen={isLogoutTimeoutModalOpen}
+            editTaskData={editTaskForm && editTaskData}
+            loadingAddTask={loadingAddTask}
+            loadingEditTask={loadingEditTask}
             taskBodyValue={formData.taskBody}
             taskFinishDateValue={formData.taskFinishDate}
             taskPriorityValue={formData.taskPriority}
@@ -349,19 +535,23 @@ const Form = ({
             handleErrorInformation={handleErrorInformation}
             handleSubmitForm={handleSubmitForm}
             handleUserInput={handleUserInput}
-            setFormKind={setFormKind}
+            setFormType={setFormType}
           />
         </Modal>
       )}
-      {clearTasksListForm && (
+      {(confirmFormTasksList || confirmFormAccount) && (
         <Modal handleCloseModal={handleCloseModal}>
-          <ClearTasksListForm
+          <ConfirmForm
+            confirmFormAccount={confirmFormAccount}
+            confirmFormTasksList={confirmFormTasksList}
+            loadingDeleteAllTasks={loadingDeleteAllTasks}
+            loadingDeleteUser={loadingDeleteUser}
+            formSentSuccessfully={formSentSuccessfully}
             handleCloseModal={handleCloseModal}
-            isLogoutTimeoutModalOpen={isLogoutTimeoutModalOpen}
             ref={modalElementToSetFocus}
+            handleErrorInformation={handleErrorInformation}
             handleSubmitForm={handleSubmitForm}
-            handleUserInput={handleUserInput}
-            setFormKind={setFormKind}
+            setFormType={setFormType}
           />
         </Modal>
       )}

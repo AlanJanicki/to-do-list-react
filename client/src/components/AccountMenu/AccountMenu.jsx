@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeUser } from '../../redux/authSlice';
 import { closeAccountMenu, setAccountMenuHeight } from '../../redux/layoutSlice';
+import { resetTasksList } from '../../redux/tasksListSlice';
 
 import useWindowWidth from '../../hooks/useWindowWidth';
 
@@ -67,8 +68,11 @@ const AccountMenu = () => {
   };
 
   const handleLogoutUser = () => {
-    dispatch(removeUser());
     dispatch(closeAccountMenu());
+    setTimeout(() => {
+      dispatch(removeUser());
+      dispatch(resetTasksList());
+    }, 500);
   };
 
   return (
@@ -98,6 +102,13 @@ const AccountMenu = () => {
           Zmień avatar
         </button>
         <button
+          data-option='deleteAccount'
+          disabled={isModalOpen || isLogoutTimeoutModalOpen}
+          tabIndex={!isAccountMenuOpen ? -1 : null}
+          onClick={handleSelectOption}>
+          Usuń konto
+        </button>
+        <button
           data-option='logout'
           disabled={isModalOpen || isLogoutTimeoutModalOpen}
           tabIndex={!isAccountMenuOpen ? -1 : null}
@@ -111,6 +122,13 @@ const AccountMenu = () => {
       )}
       {selectedOption === 'changeAvatar' && (
         <Form avatarsForm={true} isModalOpenOnInit={true} disableForm={handleUnselectOption} />
+      )}
+      {selectedOption === 'deleteAccount' && (
+        <Form
+          confirmFormAccount={true}
+          isModalOpenOnInit={true}
+          disableForm={handleUnselectOption}
+        />
       )}
     </>
   );

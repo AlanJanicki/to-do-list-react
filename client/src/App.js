@@ -1,5 +1,7 @@
-import { Route, Routes } from 'react-router-dom';
+import { useEffect } from 'react';
 
+import { useApolloClient } from '@apollo/client';
+import { Route, Routes } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import './App.css';
@@ -10,6 +12,14 @@ import Home from './pages/Home/Home';
 
 function App() {
   const user = useSelector((state) => state.auth.user);
+
+  const client = useApolloClient();
+
+  useEffect(() => {
+    if (!user) {
+      client.clearStore();
+    }
+  }, [client, user]);
 
   return (
     <div className='App'>

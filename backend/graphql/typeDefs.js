@@ -12,7 +12,8 @@ const typeDefs = gql`
 
   type TasksList {
     tasks: [Task]
-    userId: ID!
+    tasksAmount: Int
+    tasksFilteredAmount: Int
   }
 
   type User {
@@ -47,20 +48,30 @@ const typeDefs = gql`
     priority: String
   }
 
+  input QueryInput {
+    displayFilter: String
+    searchedTask: String
+    tasksSortType: String
+    tasksListPage: Int
+    tasksPerPage: Int
+  }
+
   type Mutation {
-    createTask(input: TaskInput): TasksList!
-    deleteTask(taskId: ID!): TasksList!
-    deleteAllTasks: TasksList!
-    editTask(taskId: ID!, input: TaskInput): TasksList!
+    addTask(input: TaskInput!): Boolean
+    deleteTasks(input: [ID]!): Boolean
+    deleteAllTasks: Boolean
+    deleteUser: Boolean
+    editTask(taskId: ID!, input: TaskInput!): Boolean
     login(login: String!, password: String!): User!
-    register(input: RegisterInput): User!
-    updateTasksOrder(input: [TaskInput]): TasksList!
+    toggleTaskDone(taskId: ID!, done: Boolean!): Boolean
+    register(input: RegisterInput!): Boolean
+    updateTasksOrder(input: [TaskInput]!): Boolean
     updateUserAvatar(avatar: String!): User!
     updateUserPassword(input: ChangePasswordInput!): User!
   }
 
   type Query {
-    getTasks: TasksList
+    getTasks(input: QueryInput): TasksList!
   }
 `;
 
