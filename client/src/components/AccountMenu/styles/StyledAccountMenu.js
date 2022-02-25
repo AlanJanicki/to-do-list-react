@@ -16,6 +16,7 @@ export const Menu = styled.ul`
   flex-wrap: wrap;
   width: 100%;
   max-width: 1400px;
+  border-top: ${(props) => props.isDarkModeActive && '1px solid #919191'};
   list-style: none;
   transition: top 0.5s ease;
 
@@ -23,16 +24,17 @@ export const Menu = styled.ul`
     flex-basis: 100%;
     padding: 15px 0;
     border: none;
-    border-bottom: 1px solid #dfe0df;
-    color: #fff;
-    background-color: #ee7300;
+    border-bottom: ${(props) =>
+      props.isDarkModeActive ? '1px solid #0e1217' : '1px solid #dfe0df'};
+    color: ${(props) => (props.isDarkModeActive ? '#ee7300' : '#fff')};
+    background-color: ${(props) => (props.isDarkModeActive ? '#171a22' : '#ee7300')};
     font-weight: bold;
     text-align: center;
     cursor: pointer;
     outline-offset: -5px;
 
     &:focus {
-      outline: 1px solid #fff;
+      outline: ${(props) => (props.isDarkModeActive ? '1px solid #ee7300' : '1px solid #fff')};
     }
 
     &:focus:not(:focus-visible) {
@@ -40,7 +42,7 @@ export const Menu = styled.ul`
     }
 
     &:focus-visible {
-      outline: 1px solid #fff;
+      outline: ${(props) => (props.isDarkModeActive ? '1px solid #ee7300' : '1px solid #fff')};
     }
 
     &:nth-of-type(1) {
@@ -50,6 +52,7 @@ export const Menu = styled.ul`
     @media (hover: hover) {
       &:hover {
         text-decoration: underline;
+        color: ${(props) => props.isDarkModeActive && '#e2e2e2'};
       }
     }
 
@@ -61,6 +64,10 @@ export const Menu = styled.ul`
 
     @media (min-width: 992px) {
       font-size: 1.1rem;
+    }
+
+    @media print {
+      display: none;
     }
   }
 `;

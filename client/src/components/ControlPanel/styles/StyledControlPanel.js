@@ -11,7 +11,11 @@ export const Wrapper = styled.div`
   flex-wrap: wrap;
   width: 100%;
   max-width: 1400px;
-  background-color: #f7f7f7;
+  background-color: ${(props) => (props.isDarkModeActive ? '#171a22' : '#f7f7f7')};
+
+  @media print {
+    display: none;
+  }
 `;
 
 export const ControlPanelWrapper = styled.div`
@@ -19,7 +23,7 @@ export const ControlPanelWrapper = styled.div`
   justify-content: space-between;
   flex-wrap: wrap;
   width: 90%;
-  padding-bottom: 10px;
+  padding-bottom: 5px;
 
   @media (min-width: 375px) {
     width: 88%;
@@ -30,10 +34,12 @@ export const Welcome = styled.div`
   display: flex;
   align-items: center;
   flex-grow: 1;
+  padding-bottom: 5px;
 
   h2 {
     margin-right: 10px;
     letter-spacing: 1px;
+    color: ${(props) => props.isDarkModeActive && '#e2e2e2'};
 
     @media (min-width: 768px) {
       margin-right: 20px;
@@ -67,16 +73,8 @@ export const Controls = styled.div`
     outline-offset: -3px;
     cursor: pointer;
 
-    p {
-      color: #000;
-
-      @media (min-width: 992px) {
-        font-size: 1.1rem;
-      }
-    }
-
     &:nth-of-type(1) {
-      color: #00b044;
+      color: ${(props) => (props.isDarkModeActive ? '#4C8077' : '#00b044')};
     }
 
     &:nth-of-type(2) {
@@ -102,6 +100,14 @@ export const Controls = styled.div`
 
     &:nth-of-type(4) {
       color: ${(props) => (props.tasksList.length > 0 ? '#2f4858' : '#919191')};
+    }
+
+    p {
+      color: ${(props) => (props.isDarkModeActive ? '#919191' : '#000')};
+
+      @media (min-width: 992px) {
+        font-size: 1.1rem;
+      }
     }
 
     @media (hover: hover) {
@@ -199,9 +205,9 @@ export const Manage = styled.div`
     padding: 1px 0px;
     border: 1px dotted #4b4b4b;
     border-radius: 5px;
-    color: #000;
+    color: ${(props) => (props.isDarkModeActive ? '#e2e2e2' : '#000')};
     cursor: pointer;
-    background-color: #fff;
+    background-color: ${(props) => (props.isDarkModeActive ? '#0e1217' : '#fff')};
     text-align: center;
 
     &:nth-of-type(2) {
@@ -260,7 +266,7 @@ export const ManageButton = styled.button`
   margin: 10px 10px 10px 0;
   border: none;
   background: none;
-  color: #5e5e5e;
+  color: ${(props) => (props.isDarkModeActive ? '#919191' : '#5e5e5e')};
   cursor: pointer;
 
   &:focus {

@@ -32,6 +32,10 @@ export const TasksListWrapper = styled.ul`
   @media (min-width: 992px) {
     padding-top: 25px;
   }
+
+  @media print {
+    margin-top: 0;
+  }
 `;
 
 export const TaskError = styled.div`
@@ -69,5 +73,43 @@ export const LoadingSpinner = styled.div`
     to {
       transform: rotate(360deg);
     }
+  }
+`;
+
+export const CheckAllTasksOnPage = styled.div`
+  display: flex;
+  justify-content: center;
+  margin: 0 auto 15px auto;
+
+  button {
+    padding: 5px 15px;
+    color: #919191;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+
+    &:focus {
+      outline: 1px solid #ee7300;
+    }
+
+    &:focus:not(:focus-visible) {
+      outline: 0;
+    }
+
+    &:focus-visible {
+      outline: 1px solid #ee7300;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        color: ${(props) =>
+          props.tasksList.length === props.checkedTasks.length ? 'red' : '#00b044'};
+      }
+    }
+  }
+
+  @media print {
+    display: none;
   }
 `;

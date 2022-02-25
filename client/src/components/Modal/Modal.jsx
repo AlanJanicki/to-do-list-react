@@ -18,6 +18,9 @@ const Modal = ({
   const isModalOpen = useSelector((state) => state.modal.isModalOpen);
   const isUserAutoLoggedOut = useSelector((state) => state.auth.isUserAutoLoggedOut);
   const isUserTokenExpired = useSelector((state) => state.auth.isUserTokenExpired);
+  const user = useSelector((state) => state.auth.user);
+
+  let isDarkModeActive = user ? user.enabledDarkMode : false;
 
   const dispatch = useDispatch();
 
@@ -90,8 +93,8 @@ const Modal = ({
 
   return (
     <ModalWrapper isModalOpen={logoutTimeoutModal ? isLogoutTimeoutModalOpen : isModalOpen}>
-      <ModalContent>
-        <CloseButton>
+      <ModalContent isDarkModeActive={isDarkModeActive}>
+        <CloseButton isDarkModeActive={isDarkModeActive}>
           <button
             disabled={!logoutTimeoutModal && isLogoutTimeoutModalOpen}
             onClick={logoutTimeoutModal ? handleCloseLogoutTimeoutModal : handleCloseModal}>

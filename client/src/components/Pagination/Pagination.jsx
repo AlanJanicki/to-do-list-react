@@ -28,6 +28,7 @@ import {
 } from './styles/StyledPagination';
 
 const Pagination = ({ isOrderUpdatingActive }) => {
+  const isDarkModeActive = useSelector((state) => state.auth.user.enabledDarkMode);
   const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
   const isModalOpen = useSelector((state) => state.modal.isModalOpen);
   const tasksAmount = useSelector((state) => state.tasksList.tasksAmount);
@@ -159,7 +160,7 @@ const Pagination = ({ isOrderUpdatingActive }) => {
                 </AllTasks>
               </TasksAmount>
 
-              <Navigate>
+              <Navigate isDarkModeActive={isDarkModeActive}>
                 {tasksListPage > 2 && (
                   <FirstTasksListPage
                     disabled={isModalOpen || isLogoutTimeoutModalOpen}

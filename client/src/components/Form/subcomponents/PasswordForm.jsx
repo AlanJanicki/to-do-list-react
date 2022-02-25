@@ -24,6 +24,7 @@ const PasswordForm = React.forwardRef(
     },
     ref
   ) => {
+    const isDarkModeActive = useSelector((state) => state.auth.user.enabledDarkMode);
     const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
 
     useEffect(() => {
@@ -35,7 +36,7 @@ const PasswordForm = React.forwardRef(
         {formSentSuccessfully ? (
           <SuccessInfo>Hasło zostało zmienione</SuccessInfo>
         ) : (
-          <Form onSubmit={handleSubmitForm}>
+          <Form isDarkModeActive={isDarkModeActive} onSubmit={handleSubmitForm}>
             {handleErrorInformation()}
             {formErrors.oldPassword && (
               <FormParagraph error={true}>{formErrors.oldPassword}</FormParagraph>
@@ -48,6 +49,7 @@ const PasswordForm = React.forwardRef(
               placeholder='Stare hasło'
               required
               value={oldPasswordValue}
+              isDarkModeActive={isDarkModeActive}
               ref={ref}
               onChange={(e) => handleUserInput(e)}
             />
@@ -66,6 +68,7 @@ const PasswordForm = React.forwardRef(
               placeholder='Nowe hasło'
               required
               value={newPasswordValue}
+              isDarkModeActive={isDarkModeActive}
               onChange={(e) => handleUserInput(e)}
             />
             {newPasswordValue.length === 0 && (
@@ -89,6 +92,7 @@ const PasswordForm = React.forwardRef(
               placeholder='Powtórz hasło'
               required
               value={newPasswordValueRepeated}
+              isDarkModeActive={isDarkModeActive}
               onChange={(e) => handleUserInput(e)}
             />
 

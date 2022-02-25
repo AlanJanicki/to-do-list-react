@@ -35,6 +35,7 @@ const TaskForm = React.forwardRef(
     },
     ref
   ) => {
+    const isDarkModeActive = useSelector((state) => state.auth.user.enabledDarkMode);
     const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
 
     useEffect(() => {
@@ -53,7 +54,7 @@ const TaskForm = React.forwardRef(
         stars = [...stars, <FontAwesomeIcon key={i} icon={faStar} />];
 
         priorityStars.push(
-          <Priority key={i} amount={i}>
+          <Priority isDarkModeActive={isDarkModeActive} key={i} amount={i}>
             <input
               checked={i === parseInt(taskPriorityValue, 10)}
               disabled={isLogoutTimeoutModalOpen}
@@ -78,7 +79,7 @@ const TaskForm = React.forwardRef(
     handleMinDateInput();
 
     return (
-      <Form onSubmit={handleSubmitForm}>
+      <Form isDarkModeActive={isDarkModeActive} onSubmit={handleSubmitForm}>
         {handleErrorInformation()}
         {formErrors.taskBody && <FormParagraph error={true}>{formErrors.taskBody}</FormParagraph>}
         <FormTextArea
@@ -89,6 +90,7 @@ const TaskForm = React.forwardRef(
           placeholder='Zadanie'
           required
           value={taskBodyValue}
+          isDarkModeActive={isDarkModeActive}
           ref={ref}
           onChange={(e) => handleUserInput(e)}
         />
@@ -99,7 +101,9 @@ const TaskForm = React.forwardRef(
         {formErrors.taskFinishDate && (
           <FormParagraph error={true}>{formErrors.taskFinishDate}</FormParagraph>
         )}
-        <FormParagraph>Planowana data zakończenia</FormParagraph>
+        <FormParagraph isDarkModeActive={isDarkModeActive}>
+          Planowana data zakończenia
+        </FormParagraph>
         <FormInput
           disabled={isLogoutTimeoutModalOpen}
           id='date'
@@ -107,16 +111,17 @@ const TaskForm = React.forwardRef(
           name='taskFinishDate'
           type='datetime-local'
           value={taskFinishDateValue}
+          isDarkModeActive={isDarkModeActive}
           onChange={(e) => handleUserInput(e)}
         />
-        <Priorities>
+        <Priorities isDarkModeActive={isDarkModeActive}>
           {formErrors.taskPriority && (
             <FormParagraph error={true}>{formErrors.taskPriority}</FormParagraph>
           )}
           <p>Priorytet zadania</p>
           <ul>
             {editTaskForm && (
-              <Priority>
+              <Priority isDarkModeActive={isDarkModeActive}>
                 <input
                   disabled={isLogoutTimeoutModalOpen}
                   id={0}

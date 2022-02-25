@@ -22,6 +22,7 @@ const AvatarsForm = React.forwardRef(
     },
     ref
   ) => {
+    const isDarkModeActive = useSelector((state) => state.auth.user.enabledDarkMode);
     const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
 
     useEffect(() => {
@@ -33,7 +34,7 @@ const AvatarsForm = React.forwardRef(
         {formSentSuccessfully ? (
           <SuccessInfo>Avatar został zmieniony</SuccessInfo>
         ) : (
-          <Form onSubmit={handleSubmitForm}>
+          <Form isDarkModeActive={isDarkModeActive} onSubmit={handleSubmitForm}>
             {handleErrorInformation()}
             {formErrors.avatar && <FormParagraph error={true}>{formErrors.avatar}</FormParagraph>}
             <Avatars avatarValue={avatarValue} ref={ref} handleUserInput={handleUserInput} />

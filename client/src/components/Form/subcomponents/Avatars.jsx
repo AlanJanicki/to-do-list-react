@@ -6,6 +6,9 @@ import { Avatar, AvatarsWrapper, FormParagraph } from '../styles/StyledForm';
 
 const Avatars = React.forwardRef(({ avatarValue, handleUserInput }, ref) => {
   const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
+  const user = useSelector((state) => state.auth.user);
+
+  let isDarkModeActive = user ? user.enabledDarkMode : false;
 
   const avatars = [];
 
@@ -15,7 +18,7 @@ const Avatars = React.forwardRef(({ avatarValue, handleUserInput }, ref) => {
 
     for (let i = 0; i < 8; i++) {
       avatars.push(
-        <Avatar key={i} offset={offset}>
+        <Avatar isDarkModeActive={isDarkModeActive} key={i} offset={offset}>
           <label htmlFor={i}></label>
           {i === 0 ? (
             <input
@@ -48,7 +51,7 @@ const Avatars = React.forwardRef(({ avatarValue, handleUserInput }, ref) => {
 
   return (
     <AvatarsWrapper>
-      <FormParagraph>Wybierz swój avatar</FormParagraph>
+      <FormParagraph isDarkModeActive={isDarkModeActive}>Wybierz swój avatar</FormParagraph>
       <ul>{generateAvatars()}</ul>
     </AvatarsWrapper>
   );

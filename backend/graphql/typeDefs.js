@@ -19,10 +19,11 @@ const typeDefs = gql`
   type User {
     avatar: String!
     createdAt: String!
+    enabledDarkMode: Boolean!
     id: ID!
     login: String!
     name: String!
-    token: String
+    token: String!
   }
 
   input ChangePasswordInput {
@@ -63,6 +64,7 @@ const typeDefs = gql`
     deleteUser: Boolean
     editTask(taskId: ID!, input: TaskInput!): Boolean
     login(login: String!, password: String!): User!
+    toggleDarkMode(darkModeState: Boolean!): User!
     toggleTaskDone(taskId: ID!, done: Boolean!): Boolean
     register(input: RegisterInput!): Boolean
     updateTasksOrder(input: [TaskInput]!): Boolean

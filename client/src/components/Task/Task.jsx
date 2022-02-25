@@ -26,6 +26,7 @@ const Task = ({
   provided,
 }) => {
   const checkedTasks = useSelector((state) => state.tasksList.checkedTasks);
+  const isDarkModeActive = useSelector((state) => state.auth.user.enabledDarkMode);
   const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
   const isModalOpen = useSelector((state) => state.modal.isModalOpen);
   const tasksSortType = useSelector((state) => state.tasksList.sortType);
@@ -126,6 +127,7 @@ const Task = ({
   return (
     <TaskWrapper
       done={done}
+      isDarkModeActive={isDarkModeActive}
       loadingToggleTaskDone={loadingToggleTaskDone}
       ref={innerRef}
       {...provided.draggableProps}>

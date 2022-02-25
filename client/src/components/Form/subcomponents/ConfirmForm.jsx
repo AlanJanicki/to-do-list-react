@@ -21,6 +21,7 @@ const ConfirmForm = React.forwardRef(
     },
     ref
   ) => {
+    const isDarkModeActive = useSelector((state) => state.auth.user.enabledDarkMode);
     const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
 
     useEffect(() => {
@@ -36,7 +37,7 @@ const ConfirmForm = React.forwardRef(
         {formSentSuccessfully ? (
           <SuccessInfo>Konto zostało usunięte</SuccessInfo>
         ) : (
-          <Form onSubmit={handleSubmitForm}>
+          <Form isDarkModeActive={isDarkModeActive} onSubmit={handleSubmitForm}>
             {handleErrorInformation()}
             <ClearTasksListFormWrapper>
               <p>

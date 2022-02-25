@@ -15,9 +15,13 @@ import {
 import verifyAuth from '../../utils/verifyAuth.js';
 
 const generateToken = (user) => {
-  return jwt.sign({ avatar: user.avatar, id: user.id, name: user.name }, process.env.JSONWT_KEY, {
-    expiresIn: '6h',
-  });
+  return jwt.sign(
+    { avatar: user.avatar, enabledDarkMode: user.enabledDarkMode, id: user.id, name: user.name },
+    process.env.JSONWT_KEY,
+    {
+      expiresIn: '6h',
+    }
+  );
 };
 
 const user = {
@@ -89,7 +93,13 @@ const user = {
       }
       const token = generateToken(user);
 
-      return { avatar: user.avatar, id: user.id, name: user.name, token };
+      return {
+        avatar: user.avatar,
+        enabledDarkMode: user.enabledDarkMode,
+        id: user.id,
+        name: user.name,
+        token,
+      };
     },
 
     async register(_, { input: { avatar, login, name, password, passwordRepeated } }) {
@@ -111,6 +121,7 @@ const user = {
 
       const newUser = new User({
         avatar,
+        enabledDarkMode: false,
         login,
         name,
         password,
@@ -137,6 +148,44 @@ const user = {
           },
         });
       }
+    },
+
+    async toggleDarkMode(_, { darkModeState }, context) {
+      const user = verifyAuth(context);
+
+      const userToUpdate = await User.findById(user.id);
+      if (!userToUpdate) {
+        throw new UserInputError('', {
+          errors: {
+            uncategorizedErrors: 'Nie odnaleziono użytkownika o podanym ID',
+          },
+        });
+      }
+
+      let res;
+      try {
+        res = await User.findByIdAndUpdate(
+          user.id,
+          { enabledDarkMode: darkModeState },
+          { new: true }
+        );
+      } catch (error) {
+        throw new UserInputError('', {
+          errors: {
+            uncategorizedErrors: 'Nie udało się motywu. Spróbuj ponownie.',
+          },
+        });
+      }
+
+      const token = generateToken(res);
+
+      return {
+        avatar: res.avatar,
+        enabledDarkMode: res.enabledDarkMode,
+        id: res.id,
+        name: res.name,
+        token,
+      };
     },
 
     async updateUserPassword(
@@ -184,7 +233,13 @@ const user = {
 
       const token = generateToken(res);
 
-      return { avatar: res.avatar, id: res.id, name: res.name, token };
+      return {
+        avatar: res.avatar,
+        enabledDarkMode: res.enabledDarkMode,
+        id: res.id,
+        name: res.name,
+        token,
+      };
     },
 
     async updateUserAvatar(_, { avatar }, context) {
@@ -217,7 +272,13 @@ const user = {
 
       const token = generateToken(res);
 
-      return { avatar: res.avatar, id: res.id, name: res.name, token };
+      return {
+        avatar: res.avatar,
+        enabledDarkMode: res.enabledDarkMode,
+        id: res.id,
+        name: res.name,
+        token,
+      };
     },
   },
 };

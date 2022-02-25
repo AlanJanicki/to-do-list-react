@@ -68,7 +68,7 @@ export const Form = styled.form`
   max-height: 100%;
   padding: 30px;
   border-radius: 5px;
-  background-color: #f7f7f7;
+  background-color: ${(props) => (props.isDarkModeActive ? '#171a22' : '#f7f7f7')};
 
   button {
     margin-top: 15px;
@@ -95,7 +95,7 @@ export const Form = styled.form`
     }
 
     &:nth-of-type(2) {
-      background-color: #ffa95d;
+      background-color: ${(props) => (props.isDarkModeActive ? '#C65300' : '#ffa95d')};
     }
 
     @media (min-width: 768px) {
@@ -128,9 +128,15 @@ export const FormInput = styled.input`
   padding: 15px;
   border: ${(props) => (props.errorBorder ? '1px solid red' : 'none')};
   border-radius: 5px;
+  color: ${(props) => props.isDarkModeActive && '#e2e2e2'};
+  background-color: ${(props) => props.isDarkModeActive && '#0e1217'};
 
-  &[type='date']:valid {
-    color: #000;
+  &[type='datetime-local']:valid {
+    color: ${(props) => (props.isDarkModeActive ? '#919191' : '#000')};
+  }
+
+  &[type='datetime-local']::-webkit-calendar-picker-indicator {
+    filter: ${(props) => props.isDarkModeActive && 'invert(0.5)'};
   }
 
   &:focus {
@@ -154,6 +160,8 @@ export const FormTextArea = styled.textarea`
   padding: 15px;
   border: none;
   border-radius: 5px;
+  color: ${(props) => props.isDarkModeActive && '#e2e2e2'};
+  background-color: ${(props) => props.isDarkModeActive && '#0e1217'};
 
   &:focus {
     border: 1px solid #ee7300;
@@ -175,6 +183,10 @@ export const FormParagraph = styled.p`
   max-width: 100%;
   padding: ${(props) => (props.warning ? '0' : '15px 0')};
   color: ${(props) => {
+    if (props.isDarkModeActive) {
+      return '#e2e2e2';
+    }
+
     if (props.error || props.warning) {
       if (props.error) {
         return 'red';
@@ -228,6 +240,7 @@ export const Avatar = styled.li`
 
   input {
     cursor: pointer;
+    filter: ${(props) => props.isDarkModeActive && 'grayscale(1)'};
   }
 `;
 
@@ -243,6 +256,10 @@ export const Priorities = styled.div`
     flex-wrap: wrap;
     display: flex;
     list-style: none;
+  }
+
+  p {
+    color: ${(props) => props.isDarkModeActive && '#e2e2e2'};
   }
 `;
 
@@ -263,6 +280,8 @@ export const Priority = styled.li`
         return '#FF8652';
       } else if (props.amount === 3) {
         return '#ee7300';
+      } else if (props.isDarkModeActive) {
+        return '#e2e2e2';
       }
     }};
     cursor: pointer;
@@ -270,6 +289,7 @@ export const Priority = styled.li`
 
   input {
     cursor: pointer;
+    filter: ${(props) => props.isDarkModeActive && 'grayscale(1)'};
   }
 `;
 

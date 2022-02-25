@@ -49,6 +49,7 @@ const ControlPanel = () => {
 
   const checkedTasks = useSelector((state) => state.tasksList.checkedTasks);
   const headerHeight = useSelector((state) => state.layout.headerHeight);
+  const isDarkModeActive = useSelector((state) => state.auth.user.enabledDarkMode);
   const isModalOpen = useSelector((state) => state.modal.isModalOpen);
   const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
   const tasksDisplayFilter = useSelector((state) => state.tasksList.displayFilter);
@@ -167,14 +168,19 @@ const ControlPanel = () => {
 
   return (
     <>
-      <Wrapper headerHeight={headerHeight} ref={controlPanel} showSortSelect={showSortSelect}>
+      <Wrapper
+        isDarkModeActive={isDarkModeActive}
+        headerHeight={headerHeight}
+        ref={controlPanel}
+        showSortSelect={showSortSelect}>
         <ControlPanelWrapper>
-          <Welcome avatar={user.avatar}>
+          <Welcome avatar={user.avatar} isDarkModeActive={isDarkModeActive}>
             <h2>Witaj, {user.name}</h2>
             <span></span>
           </Welcome>
           <Controls
             checkedTasks={checkedTasks}
+            isDarkModeActive={isDarkModeActive}
             isModalOpen={isModalOpen}
             isLogoutTimeoutModalOpen={isLogoutTimeoutModalOpen}
             loadingDeleteTasks={loadingDeleteTasks}
@@ -236,9 +242,13 @@ const ControlPanel = () => {
           </Controls>
         </ControlPanelWrapper>
 
-        <Manage showDisplaySelect={showDisplaySelect} showSortSelect={showSortSelect}>
+        <Manage
+          isDarkModeActive={isDarkModeActive}
+          showDisplaySelect={showDisplaySelect}
+          showSortSelect={showSortSelect}>
           <ManageButton
             disabled={isModalOpen || isLogoutTimeoutModalOpen}
+            isDarkModeActive={isDarkModeActive}
             runFadeOutSortSelectAnimation={runFadeOutSortSelectAnimation}
             sortSelectButton={true}
             onClick={handleToggleShowSortSelect}>
@@ -266,6 +276,7 @@ const ControlPanel = () => {
           <ManageButton
             disabled={isModalOpen || isLogoutTimeoutModalOpen}
             displaySelectButton={true}
+            isDarkModeActive={isDarkModeActive}
             runFadeOutDisplaySelectAnimation={runFadeOutDisplaySelectAnimation}
             onClick={handleToggleShowDisplaySelect}>
             Wyświetlaj:

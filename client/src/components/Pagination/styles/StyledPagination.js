@@ -46,6 +46,10 @@ export const PaginationWrapper = styled.div`
       font-size: 1rem;
     }
   }
+
+  @media print {
+    display: none;
+  }
 `;
 
 export const TasksAmount = styled.div`
@@ -96,7 +100,8 @@ export const Navigate = styled.div`
     background-color: #fff;
     border: 1px dotted #4b4b4b;
     border-radius: 5px;
-    color: #000;
+    color: ${(props) => (props.isDarkModeActive ? '#e2e2e2' : '#000')};
+    background-color: ${(props) => (props.isDarkModeActive ? '#0e1217' : '#fff')};
     text-align: center;
     cursor: pointer;
 

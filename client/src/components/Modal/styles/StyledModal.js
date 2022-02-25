@@ -23,9 +23,9 @@ export const ModalContent = styled.div`
   max-height: 90%;
   flex-direction: column;
   padding: 20px;
-  border: 1px solid #f7f7f7;
+  border: ${(props) => (props.isDarkModeActive ? '1px solid #171a22' : '1px solid #f7f7f7')};
   border-radius: 5px;
-  background-color: #fff;
+  background-color: ${(props) => (props.isDarkModeActive ? '#0e1217' : '#fff')};
 `;
 
 export const CloseButton = styled.div`
@@ -34,7 +34,7 @@ export const CloseButton = styled.div`
 
   button {
     border: none;
-    color: #aaaaaa;
+    color: ${(props) => (props.isDarkModeActive ? '#4C8077' : '#aaa')};
     background: none;
     font-size: 28px;
     font-weight: bold;

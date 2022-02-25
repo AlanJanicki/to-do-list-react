@@ -2,6 +2,8 @@ import { useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  clearCheckedTasks,
+  setCheckedTask,
   setTasksAmount,
   setTasksFilteredAmount,
   setTasksList,
@@ -13,13 +15,21 @@ import { setIsUserTokenExpired } from '../../redux/authSlice.js';
 
 import { Draggable, DragDropContext, Droppable } from 'react-beautiful-dnd';
 
+import { faCheckDouble, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import { useMutation, useQuery } from '@apollo/client';
 import { UPDATE_TASKS_ORDER } from '../../graphql/mutations/tasksList.js';
 import { GET_TASKS } from '../../graphql/queries/tasksList.js';
 
 import { checkUserTokenValidity } from '../../utils/checkUserTokenValidity.js';
 
-import { LoadingSpinner, TaskError, TasksListWrapper } from './styles/StyledTasksList.js';
+import {
+  CheckAllTasksOnPage,
+  LoadingSpinner,
+  TaskError,
+  TasksListWrapper,
+} from './styles/StyledTasksList.js';
 
 import Task from '../Task/Task';
 import Pagination from '../Pagination/Pagination.jsx';
@@ -29,6 +39,7 @@ const TasksList = () => {
 
   const accountMenuHeight = useSelector((state) => state.layout.accountMenuHeight);
   const controlPanelHeight = useSelector((state) => state.layout.controlPanelHeight);
+  const checkedTasks = useSelector((state) => state.tasksList.checkedTasks);
   const displayFilter = useSelector((state) => state.tasksList.displayFilter);
   const headerHeight = useSelector((state) => state.layout.headerHeight);
   const isAccountMenuOpen = useSelector((state) => state.layout.isAccountMenuOpen);
@@ -149,7 +160,7 @@ const TasksList = () => {
             return (
               <>
                 <TaskError>
-                  <p>W trakcie operacji na liście zadań wystąpiły następujące błędy:</p>
+                  <p>W trakcie operacji wystąpiły następujące błędy:</p>
                   {<p>{tasksListErrors.uncategorizedErrors}</p>}
                 </TaskError>
               </>
@@ -172,6 +183,22 @@ const TasksList = () => {
           }
         }
       }
+    }
+  };
+
+  const handleCheckAllTasksOnPage = (action) => {
+    if (action === 'check') {
+      const checkedTasksIds = checkedTasks.map((task) => task.id);
+      const tasksIds = tasksList.map((task) => task.id);
+      tasksIds.forEach((taskId) => {
+        if (checkedTasksIds.some((checkedTaskId) => checkedTaskId === taskId)) {
+          return;
+        } else {
+          dispatch(setCheckedTask(taskId));
+        }
+      });
+    } else if (action === 'unCheck') {
+      dispatch(clearCheckedTasks());
     }
   };
 
@@ -231,6 +258,28 @@ const TasksList = () => {
           )}
         </Droppable>
       </DragDropContext>
+      {tasksList.length > 0 && !isOrderUpdatingActive && (
+        <CheckAllTasksOnPage tasksList={tasksList} checkedTasks={checkedTasks}>
+          {tasksList.length > 1 && checkedTasks.length < tasksList.length && (
+            <button
+              disabled={isModalOpen || isLogoutTimeoutModalOpen}
+              title={'Zaznacz wszystkie zadania na stronie'}
+              onClick={() => handleCheckAllTasksOnPage('check')}>
+              <FontAwesomeIcon icon={faCheckDouble} />
+            </button>
+          )}
+
+          {tasksList.length > 1 && checkedTasks.length === tasksList.length && (
+            <button
+              disabled={isModalOpen || isLogoutTimeoutModalOpen}
+              title={'Odznacz wszystkie zadania na stronie'}
+              onClick={() => handleCheckAllTasksOnPage('unCheck')}>
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+          )}
+        </CheckAllTasksOnPage>
+      )}
+
       <Pagination isOrderUpdatingActive={isOrderUpdatingActive} />
     </>
   );

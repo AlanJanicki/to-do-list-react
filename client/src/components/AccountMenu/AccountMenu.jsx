@@ -18,6 +18,7 @@ const AccountMenu = () => {
   const controlPanelHeight = useSelector((state) => state.layout.controlPanelHeight);
   const headerHeight = useSelector((state) => state.layout.headerHeight);
   const isAccountMenuOpen = useSelector((state) => state.layout.isAccountMenuOpen);
+  const isDarkModeActive = useSelector((state) => state.auth.user.enabledDarkMode);
   const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
   const isModalOpen = useSelector((state) => state.modal.isModalOpen);
 
@@ -81,6 +82,7 @@ const AccountMenu = () => {
         controlPanelHeight={controlPanelHeight}
         headerHeight={headerHeight}
         isAccountMenuOpen={isAccountMenuOpen}
+        isDarkModeActive={isDarkModeActive}
         removedOutline={removedOutline}
         ref={accountMenu}>
         <button

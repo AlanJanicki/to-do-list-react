@@ -8,6 +8,10 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
+    enabledDarkMode: {
+      type: Boolean,
+      required: true,
+    },
     login: {
       type: String,
       required: true,

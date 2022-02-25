@@ -11,9 +11,13 @@ export const TaskWrapper = styled.li`
   row-gap: 10px;
   padding-bottom: 15px;
   border-bottom: 1px solid #dfe0df;
+  color: ${(props) => props.isDarkModeActive && '#e2e2e2'};
 
   input[type='checkbox'] {
+    filter: ${(props) => props.isDarkModeActive && 'grayscale(1)'};
+
     &:focus {
+      filter: unset;
       outline: 1px solid #ee7300;
     }
 
@@ -22,6 +26,7 @@ export const TaskWrapper = styled.li`
     }
 
     &:focus-visible {
+      filter: unset;
       outline: 1px solid #ee7300;
     }
 
@@ -35,6 +40,10 @@ export const TaskWrapper = styled.li`
 
     @media (min-width: 992px) {
       margin: 0 20px 0 0;
+    }
+
+    @media print {
+      display: none;
     }
   }
 
@@ -137,6 +146,10 @@ export const TaskDoneButton = styled.button`
     margin-right: 20px;
   }
 
+  @media print {
+    display: none;
+  }
+
   @keyframes shake {
     10%,
     90% {
@@ -231,6 +244,10 @@ export const PriorityStarsList = styled.ul`
       &:hover {
         border: ${(props) => props.tasksSortType === 'own' && '3px solid #4c8077'};
       }
+    }
+
+    @media print {
+      display: none;
     }
   }
 `;
