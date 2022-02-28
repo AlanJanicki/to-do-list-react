@@ -69,7 +69,7 @@ const ControlPanel = () => {
       if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
         dispatch(setTasksListErrors(err.graphQLErrors[0].message));
       } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
-        dispatch(setTasksListErrors([err.graphQLErrors[0].extensions.errors]));
+        dispatch(setTasksListErrors(err.graphQLErrors[0].extensions.errors));
       }
     },
     refetchQueries: [GET_TASKS, 'Query'],
@@ -77,7 +77,7 @@ const ControlPanel = () => {
 
   useLayoutEffect(() => {
     dispatch(setControlPanelHeight(controlPanel.current.getBoundingClientRect().height));
-  }, [dispatch, showDisplaySelect, showSortSelect, tasksList, windowWidth]);
+  }, [dispatch, showDisplaySelect, showSortSelect, tasksList, windowWidth, user.ownAvatar]);
 
   const handleUncheckFilteredTasks = useCallback(() => {
     const checkedTasksIds = checkedTasks.map((task) => task.id);
@@ -174,7 +174,10 @@ const ControlPanel = () => {
         ref={controlPanel}
         showSortSelect={showSortSelect}>
         <ControlPanelWrapper>
-          <Welcome avatar={user.avatar} isDarkModeActive={isDarkModeActive}>
+          <Welcome
+            avatar={user.avatar}
+            isDarkModeActive={isDarkModeActive}
+            ownAvatar={user.ownAvatar}>
             <h2>Witaj, {user.name}</h2>
             <span></span>
           </Welcome>

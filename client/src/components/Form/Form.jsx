@@ -50,6 +50,7 @@ const Form = ({
     name: '',
     newPassword: '',
     oldPassword: '',
+    ownAvatar: '',
     password: '',
     passwordRepeated: '',
     taskBody: '',
@@ -63,7 +64,6 @@ const Form = ({
   const [formSentSuccessfully, setFormSentSuccessfully] = useState(false);
   const [formWarnings, setFormWarnings] = useState(initFormDataState);
 
-  const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
   const isModalOpen = useSelector((state) => state.modal.isModalOpen);
   const user = useSelector((state) => state.auth.user);
 
@@ -82,7 +82,7 @@ const Form = ({
       if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
         handleSetErrors(err.graphQLErrors[0].message);
       } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
-        handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+        handleSetErrors(err.graphQLErrors[0].extensions.errors);
       }
     },
     update() {
@@ -96,7 +96,7 @@ const Form = ({
       if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
         handleSetErrors(err.graphQLErrors[0].message);
       } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
-        handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+        handleSetErrors(err.graphQLErrors[0].extensions.errors);
       }
     },
     update() {
@@ -111,7 +111,7 @@ const Form = ({
         if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
           handleSetErrors(err.graphQLErrors[0].message);
         } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
-          handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+          handleSetErrors(err.graphQLErrors[0].extensions.errors);
         }
       },
       update() {
@@ -126,7 +126,7 @@ const Form = ({
         if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
           handleSetErrors(err.graphQLErrors[0].message);
         } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
-          handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+          handleSetErrors(err.graphQLErrors[0].extensions.errors);
         }
       },
       update() {
@@ -140,7 +140,7 @@ const Form = ({
       if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
         handleSetErrors(err.graphQLErrors[0].message);
       } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
-        handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+        handleSetErrors(err.graphQLErrors[0].extensions.errors);
       }
     },
     update() {
@@ -154,7 +154,7 @@ const Form = ({
       if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
         handleSetErrors(err.graphQLErrors[0].message);
       } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
-        handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+        handleSetErrors(err.graphQLErrors[0].extensions.errors);
       }
     },
     refetchQueries: [GET_TASKS, 'Query'],
@@ -169,7 +169,7 @@ const Form = ({
       if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
         handleSetErrors(err.graphQLErrors[0].message);
       } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
-        handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+        handleSetErrors(err.graphQLErrors[0].extensions.errors);
       }
     },
     refetchQueries: [GET_TASKS, 'Query'],
@@ -185,7 +185,7 @@ const Form = ({
       if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
         handleSetErrors(err.graphQLErrors[0].message);
       } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
-        handleSetErrors([err.graphQLErrors[0].extensions.errors]);
+        handleSetErrors(err.graphQLErrors[0].extensions.errors);
       }
     },
     update() {
@@ -236,9 +236,6 @@ const Form = ({
       setTimeout(() => {
         if (modalElementToSetFocus.current) {
           modalElementToSetFocus.current.focus();
-          if (modalElementToSetFocus.current.type === 'radio') {
-            modalElementToSetFocus.current.checked = true;
-          }
         }
       }, 100);
     } else if (elementToSetFocus.current) {
@@ -248,7 +245,7 @@ const Form = ({
         lastActiveElement.current.focus();
       }, 100);
     }
-  }, [isLogoutTimeoutModalOpen, isModalOpen]);
+  }, [formType, isModalOpen]);
 
   const handleOpenModal = (e) => {
     e.preventDefault();
@@ -279,15 +276,20 @@ const Form = ({
   };
 
   const handleUserInput = (e) => {
-    const name = e.target.name;
-    if (e.target.type === 'radio') {
-      const id = e.target.id;
-      setFormData({ ...formData, [name]: id });
+    if (e.target) {
+      const name = e.target.name;
+      if (e.target.type === 'radio') {
+        const id = e.target.id;
+        setFormData({ ...formData, [name]: id });
+      } else {
+        const value = e.target.value;
+        setFormData({ ...formData, [name]: value });
+        checkWarningData.current = { ...formData, [name]: value };
+      }
     } else {
-      const value = e.target.value;
-      setFormData({ ...formData, [name]: value });
-      checkWarningData.current = { ...formData, [name]: value };
+      setFormData({ ...formData, ownAvatar: e });
     }
+
     handleClearFormState([setFormWarnings]);
     const { warnings } = handleValidateInput(checkWarningData.current);
     handleSetWarnings(warnings);
@@ -331,7 +333,18 @@ const Form = ({
           },
         });
       } else if (formType === 'avatarsForm') {
-        updateUserAvatar({ variables: { avatar: formData.avatar } });
+        if (!formData.ownAvatar && !formData.avatar) {
+          handleSetErrors([
+            {
+              ownAvatar: 'Wybierz jeden z kilku avatarów lub wgraj swój własny',
+            },
+          ]);
+          return;
+        } else {
+          updateUserAvatar({
+            variables: { avatar: formData.avatar, ownAvatar: formData.ownAvatar },
+          });
+        }
       } else if (formType === 'confirmFormAccount') {
         deleteUser();
       } else if (formType === 'addTaskForm') {
@@ -471,6 +484,7 @@ const Form = ({
               avatarValue={formData.avatar}
               formErrors={formErrors}
               formSentSuccessfully={formSentSuccessfully}
+              formType={formType}
               formWarnings={formWarnings}
               loading={loadingRegisterUser}
               loginValue={formData.login}
@@ -492,6 +506,7 @@ const Form = ({
             formErrors={formErrors}
             formSentSuccessfully={formSentSuccessfully}
             loading={loadingUpdateUserAvatar}
+            ownAvatarValue={formData.ownAvatar}
             ref={modalElementToSetFocus}
             handleErrorInformation={handleErrorInformation}
             handleSubmitForm={handleSubmitForm}

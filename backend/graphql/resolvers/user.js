@@ -1,7 +1,11 @@
-import { UserInputError } from 'apollo-server';
+import fs from 'fs';
+import path from 'path';
 
+import { UserInputError } from 'apollo-server-express';
 import bcrypt from 'bcryptjs';
+import { GraphQLUpload } from 'graphql-upload';
 import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
 
 import TasksList from '../../models/TasksList.js';
 import User from '../../models/User.js';
@@ -16,7 +20,13 @@ import verifyAuth from '../../utils/verifyAuth.js';
 
 const generateToken = (user) => {
   return jwt.sign(
-    { avatar: user.avatar, enabledDarkMode: user.enabledDarkMode, id: user.id, name: user.name },
+    {
+      avatar: user.avatar,
+      enabledDarkMode: user.enabledDarkMode,
+      id: user.id,
+      name: user.name,
+      ownAvatar: user.ownAvatar,
+    },
     process.env.JSONWT_KEY,
     {
       expiresIn: '6h',
@@ -25,6 +35,8 @@ const generateToken = (user) => {
 };
 
 const user = {
+  Upload: GraphQLUpload,
+
   Mutation: {
     async deleteUser(_, __, context) {
       const user = verifyAuth(context);
@@ -32,9 +44,11 @@ const user = {
       const userToDelete = await User.findById(user.id);
       if (!userToDelete) {
         throw new UserInputError('', {
-          errors: {
-            uncategorizedErrors: 'Nie odnaleziono użytkownika o podanym ID',
-          },
+          errors: [
+            {
+              uncategorizedErrors: 'Nie odnaleziono użytkownika o podanym ID',
+            },
+          ],
         });
       }
 
@@ -42,18 +56,22 @@ const user = {
         await userToDelete.deleteOne();
       } catch (error) {
         throw new UserInputError('', {
-          errors: {
-            uncategorizedErrors: 'Nie udało się usunąć użytkownika. Spróbuj ponownie.',
-          },
+          errors: [
+            {
+              uncategorizedErrors: 'Nie udało się usunąć użytkownika. Spróbuj ponownie.',
+            },
+          ],
         });
       }
 
       const tasksListToDelete = await TasksList.findOne({ userId: user.id });
       if (!tasksListToDelete) {
         throw new UserInputError('', {
-          errors: {
-            uncategorizedErrors: 'Nie odnaleziono tablicy zadań dla użytkownika',
-          },
+          errors: [
+            {
+              uncategorizedErrors: 'Nie odnaleziono tablicy zadań dla użytkownika',
+            },
+          ],
         });
       }
 
@@ -61,9 +79,11 @@ const user = {
         await tasksListToDelete.deleteOne();
       } catch (error) {
         throw new UserInputError('', {
-          errors: {
-            uncategorizedErrors: 'Nie udało się usunąć tablicy zadań. Spróbuj ponownie.',
-          },
+          errors: [
+            {
+              uncategorizedErrors: 'Nie udało się usunąć tablicy zadań. Spróbuj ponownie.',
+            },
+          ],
         });
       }
     },
@@ -77,18 +97,22 @@ const user = {
       const user = await User.findOne({ login });
       if (!user) {
         throw new UserInputError('', {
-          errors: {
-            login: 'Nie odnaleziono użytkownika o podanym loginie',
-          },
+          errors: [
+            {
+              login: 'Nie odnaleziono użytkownika o podanym loginie',
+            },
+          ],
         });
       }
 
       const matchingPassword = await bcrypt.compare(password, user.password);
       if (!matchingPassword) {
         throw new UserInputError('', {
-          errors: {
-            password: 'Nieprawidłowe hasło',
-          },
+          errors: [
+            {
+              password: 'Nieprawidłowe hasło',
+            },
+          ],
         });
       }
       const token = generateToken(user);
@@ -98,6 +122,7 @@ const user = {
         enabledDarkMode: user.enabledDarkMode,
         id: user.id,
         name: user.name,
+        ownAvatar: user.ownAvatar.length > 0 ? user.ownAvatar : '',
         token,
       };
     },
@@ -111,9 +136,11 @@ const user = {
       const user = await User.findOne({ login });
       if (user) {
         throw new UserInputError('', {
-          errors: {
-            login: 'Ten login jest już zajęty. Wybierz inny.',
-          },
+          errors: [
+            {
+              login: 'Ten login jest już zajęty. Wybierz inny.',
+            },
+          ],
         });
       }
 
@@ -124,6 +151,7 @@ const user = {
         enabledDarkMode: false,
         login,
         name,
+        ownAvatar: '',
         password,
       });
 
@@ -132,9 +160,11 @@ const user = {
         res = await newUser.save();
       } catch (error) {
         throw new UserInputError('', {
-          errors: {
-            uncategorizedErrors: 'Nie udało się utworzyć użytkownika. Spróbuj ponownie.',
-          },
+          errors: [
+            {
+              uncategorizedErrors: 'Nie udało się utworzyć użytkownika. Spróbuj ponownie.',
+            },
+          ],
         });
       }
 
@@ -142,10 +172,12 @@ const user = {
         await new TasksList({ tasks: [], userId: res.id }).save();
       } catch (error) {
         throw new UserInputError('', {
-          errors: {
-            uncategorizedErrors:
-              'Nie udało się utworzyć tablicy zadań dla użytkownika. Spróbuj ponownie.',
-          },
+          errors: [
+            {
+              uncategorizedErrors:
+                'Nie udało się utworzyć tablicy zadań dla użytkownika. Spróbuj ponownie.',
+            },
+          ],
         });
       }
     },
@@ -156,9 +188,11 @@ const user = {
       const userToUpdate = await User.findById(user.id);
       if (!userToUpdate) {
         throw new UserInputError('', {
-          errors: {
-            uncategorizedErrors: 'Nie odnaleziono użytkownika o podanym ID',
-          },
+          errors: [
+            {
+              uncategorizedErrors: 'Nie odnaleziono użytkownika o podanym ID',
+            },
+          ],
         });
       }
 
@@ -171,9 +205,11 @@ const user = {
         );
       } catch (error) {
         throw new UserInputError('', {
-          errors: {
-            uncategorizedErrors: 'Nie udało się motywu. Spróbuj ponownie.',
-          },
+          errors: [
+            {
+              uncategorizedErrors: 'Nie udało się motywu. Spróbuj ponownie.',
+            },
+          ],
         });
       }
 
@@ -184,6 +220,7 @@ const user = {
         enabledDarkMode: res.enabledDarkMode,
         id: res.id,
         name: res.name,
+        ownAvatar: res.ownAvatar.length > 0 ? res.ownAvatar : '',
         token,
       };
     },
@@ -203,18 +240,22 @@ const user = {
       const userToUpdate = await User.findById(user.id);
       if (!userToUpdate) {
         throw new UserInputError('', {
-          errors: {
-            uncategorizedErrors: 'Nie odnaleziono użytkownika o podanym ID',
-          },
+          errors: [
+            {
+              uncategorizedErrors: 'Nie odnaleziono użytkownika o podanym ID',
+            },
+          ],
         });
       }
 
       const matchingPassword = await bcrypt.compare(oldPassword, userToUpdate.password);
       if (!matchingPassword) {
         throw new UserInputError('', {
-          errors: {
-            oldPassword: 'Nieprawidłowe stare hasło',
-          },
+          errors: [
+            {
+              oldPassword: 'Nieprawidłowe stare hasło',
+            },
+          ],
         });
       }
 
@@ -225,9 +266,11 @@ const user = {
         res = await User.findByIdAndUpdate(user.id, { password: newPassword }, { new: true });
       } catch (error) {
         throw new UserInputError('', {
-          errors: {
-            uncategorizedErrors: 'Nie udało się utworzyć zmienić hasła. Spróbuj ponownie.',
-          },
+          errors: [
+            {
+              uncategorizedErrors: 'Nie udało się utworzyć zmienić hasła. Spróbuj ponownie.',
+            },
+          ],
         });
       }
 
@@ -238,14 +281,17 @@ const user = {
         enabledDarkMode: res.enabledDarkMode,
         id: res.id,
         name: res.name,
+        ownAvatar: res.ownAvatar.length > 0 ? res.ownAvatar : '',
         token,
       };
     },
 
-    async updateUserAvatar(_, { avatar }, context) {
+    async updateUserAvatar(_, { avatar, ownAvatar }, context) {
       const user = verifyAuth(context);
+      const __dirname = path.resolve();
+      let ownAvatarName;
 
-      const errors = validateChangeAvatarInput(avatar);
+      const errors = validateChangeAvatarInput(avatar, ownAvatar.file);
       if (errors.length > 0) {
         throw new UserInputError('', { errors });
       }
@@ -253,20 +299,36 @@ const user = {
       const userToUpdate = await User.findById(user.id);
       if (!userToUpdate) {
         throw new UserInputError('', {
-          errors: {
-            uncategorizedErrors: 'Nie odnaleziono użytkownika o podanym ID',
-          },
+          errors: [
+            {
+              uncategorizedErrors: 'Nie odnaleziono użytkownika o podanym ID',
+            },
+          ],
         });
+      }
+
+      if (ownAvatar) {
+        ownAvatarName = 'avatar' + uuidv4();
+        const { createReadStream } = await ownAvatar.file;
+        const stream = createReadStream();
+        const pathName = path.join(__dirname, `/public/images/${ownAvatarName}`);
+        await stream.pipe(fs.createWriteStream(pathName));
       }
 
       let res;
       try {
-        res = await User.findByIdAndUpdate(user.id, { avatar }, { new: true });
+        if (ownAvatar) {
+          res = await User.findByIdAndUpdate(user.id, { ownAvatar: ownAvatarName }, { new: true });
+        } else {
+          res = await User.findByIdAndUpdate(user.id, { avatar, ownAvatar: '' }, { new: true });
+        }
       } catch (error) {
         throw new UserInputError('', {
-          errors: {
-            uncategorizedErrors: 'Nie udało się utworzyć zmienić avatara. Spróbuj ponownie.',
-          },
+          errors: [
+            {
+              uncategorizedErrors: 'Nie udało się utworzyć zmienić avatara. Spróbuj ponownie.',
+            },
+          ],
         });
       }
 
@@ -277,6 +339,7 @@ const user = {
         enabledDarkMode: res.enabledDarkMode,
         id: res.id,
         name: res.name,
+        ownAvatar: res.ownAvatar.length > 0 ? res.ownAvatar : '',
         token,
       };
     },

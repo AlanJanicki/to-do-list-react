@@ -40,7 +40,7 @@ const Task = ({
         dispatch(setTasksListErrors(err.graphQLErrors[0].message));
         handleErrorInformation();
       } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
-        dispatch(setTasksListErrors([err.graphQLErrors[0].extensions.errors]));
+        dispatch(setTasksListErrors(err.graphQLErrors[0].extensions.errors));
         handleErrorInformation();
       }
     },

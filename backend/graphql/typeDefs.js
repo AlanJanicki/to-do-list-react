@@ -1,6 +1,8 @@
-import { gql } from 'apollo-server';
+import { gql } from 'apollo-server-express';
 
 const typeDefs = gql`
+  scalar Upload
+
   type Task {
     body: String!
     createdAt: String!
@@ -23,6 +25,7 @@ const typeDefs = gql`
     id: ID!
     login: String!
     name: String!
+    ownAvatar: String
     token: String!
   }
 
@@ -68,7 +71,7 @@ const typeDefs = gql`
     toggleTaskDone(taskId: ID!, done: Boolean!): Boolean
     register(input: RegisterInput!): Boolean
     updateTasksOrder(input: [TaskInput]!): Boolean
-    updateUserAvatar(avatar: String!): User!
+    updateUserAvatar(avatar: String, ownAvatar: Upload): User!
     updateUserPassword(input: ChangePasswordInput!): User!
   }
 

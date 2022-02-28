@@ -20,6 +20,9 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
+    ownAvatar: {
+      type: String,
+    },
     password: {
       type: String,
       required: true,

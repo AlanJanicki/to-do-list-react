@@ -58,11 +58,21 @@ export const validateRegisterInput = (avatar, login, name, password, passwordRep
   return errors;
 };
 
-export const validateChangeAvatarInput = (avatar) => {
+export const validateChangeAvatarInput = (avatar, ownAvatar) => {
   const errors = [];
 
   if (typeof avatar !== 'string') {
     errors.push({ avatar: 'Nieprawidłowy format avatara' });
+  }
+
+  if (ownAvatar) {
+    if (
+      ownAvatar.mimetype !== 'image/jpeg' &&
+      ownAvatar.mimetype !== 'image/jpg' &&
+      ownAvatar.mimetype !== 'image/png'
+    ) {
+      errors.push({ ownAvatar: 'Nieprawidłowy format avatara' });
+    }
   }
 
   return errors;

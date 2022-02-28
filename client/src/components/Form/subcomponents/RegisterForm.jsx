@@ -11,6 +11,7 @@ const RegisterForm = React.forwardRef(
       avatarValue,
       formErrors,
       formSentSuccessfully,
+      formType,
       formWarnings,
       handleErrorInformation,
       handleSubmitForm,
@@ -91,7 +92,11 @@ const RegisterForm = React.forwardRef(
               value={passwordRepeatedValue}
               onChange={(e) => handleUserInput(e)}
             />
-            <Avatars avatarValue={avatarValue} handleUserInput={handleUserInput} />
+            <Avatars
+              avatarValue={avatarValue}
+              formType={formType}
+              handleUserInput={handleUserInput}
+            />
 
             <button disabled={loading} type='submit'>
               Utwórz konto{loading && <LoadingSpinner />}

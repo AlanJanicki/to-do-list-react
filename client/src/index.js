@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { ApolloClient, ApolloProvider, createHttpLink, InMemoryCache } from '@apollo/client';
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+import { createUploadLink } from 'apollo-upload-client';
 import { setContext } from '@apollo/client/link/context';
 import { BrowserRouter } from 'react-router-dom';
 import { store } from './redux/store';
@@ -9,8 +10,8 @@ import { Provider } from 'react-redux';
 
 import App from './App';
 
-const httpLink = createHttpLink({
-  uri: 'http://localhost:4002',
+const httpLink = createUploadLink({
+  uri: 'http://localhost:4002/graphql',
 });
 
 const authLink = setContext((_, { headers }) => {

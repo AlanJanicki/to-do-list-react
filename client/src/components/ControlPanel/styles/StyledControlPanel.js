@@ -54,10 +54,15 @@ export const Welcome = styled.div`
   span {
     display: block;
     width: 48px;
-    height: 54px;
-    background-image: url(${avatars});
-    background-position: ${(props) => `${-(props.avatar * 48)}px 0px`};
-    background-size: cover;
+    height: ${(props) => (props.ownAvatar.length === 0 ? '54px' : '100%')};
+    background-image: ${(props) =>
+      props.ownAvatar.length > 0
+        ? `url(http://localhost:4002/static/${props.ownAvatar})`
+        : `url(${avatars})`};
+    background-position: ${(props) =>
+      props.ownAvatar.length === 0 ? `${-(props.avatar * 48)}px 0px` : 'center'};
+    background-size: ${(props) => props.ownAvatar.length === 0 && 'cover'};
+    background-repeat: no-repeat;
   }
 `;
 

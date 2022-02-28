@@ -13,6 +13,7 @@ export const LOGIN_USER = gql`
       enabledDarkMode
       id
       name
+      ownAvatar
       token
     }
   }
@@ -25,6 +26,7 @@ export const TOGGLE_DARK_MODE = gql`
       enabledDarkMode
       id
       name
+      ownAvatar
       token
     }
   }
@@ -37,12 +39,13 @@ export const REGISTER_USER = gql`
 `;
 
 export const UPDATE_USER_AVATAR = gql`
-  mutation UpdateUserAvatar($avatar: String!) {
-    updateUserAvatar(avatar: $avatar) {
+  mutation UpdateUserAvatar($avatar: String, $ownAvatar: Upload) {
+    updateUserAvatar(avatar: $avatar, ownAvatar: $ownAvatar) {
       avatar
       enabledDarkMode
       id
       name
+      ownAvatar
       token
     }
   }
@@ -55,6 +58,7 @@ export const UPDATE_USER_PASSWORD = gql`
       enabledDarkMode
       id
       name
+      ownAvatar
       token
     }
   }

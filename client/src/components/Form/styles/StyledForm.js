@@ -339,3 +339,58 @@ export const LoadingSpinner = styled.span`
     }
   }
 `;
+
+export const UploadAvatar = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+
+  label {
+    display: block;
+    margin-top: 15px;
+    width: 70vw;
+    max-width: 100%;
+    padding: 10px;
+    border: 1px solid #bfbfbf;
+    border-radius: 5px;
+    color: #ee7300;
+    text-align: center;
+    cursor: pointer;
+
+    &:focus {
+      border: 2px solid #ee7300;
+      outline: 0;
+    }
+
+    span {
+      margin-top: 5px;
+      display: block;
+      color: ${(props) => (!props.isDarkModeActive ? '#3a3a3a' : '#bfbfbf')};
+      font-size: 0.9rem;
+    }
+
+    @media (min-width: 768px) {
+      width: 65vw;
+      font-size: 1.2rem;
+    }
+
+    @media (min-width: 992px) {
+      max-width: 85%;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        color: #fff;
+        background-color: #944700;
+      }
+
+      &:hover span {
+        color: #f7f7f7;
+      }
+    }
+  }
+
+  input {
+    display: none;
+  }
+`;
