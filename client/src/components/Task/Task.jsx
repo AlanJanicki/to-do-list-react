@@ -1,6 +1,11 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsUserTokenExpired } from '../../redux/authSlice';
-import { removeCheckedTask, setCheckedTask, setTasksListErrors } from '../../redux/tasksListSlice';
+import {
+  clearCheckedTasks,
+  removeCheckedTask,
+  setCheckedTask,
+  setTasksListErrors,
+} from '../../redux/tasksListSlice';
 
 import { useMutation } from '@apollo/client';
 import { TOGGLE_TASK_DONE } from '../../graphql/mutations/tasksList';
@@ -43,6 +48,9 @@ const Task = ({
         dispatch(setTasksListErrors(err.graphQLErrors[0].extensions.errors));
         handleErrorInformation();
       }
+    },
+    update() {
+      dispatch(clearCheckedTasks());
     },
     refetchQueries: [GET_TASKS, 'Query'],
   });

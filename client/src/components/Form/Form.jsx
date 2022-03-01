@@ -9,7 +9,12 @@ import { clearCheckedTasks, resetTasksList } from '../../redux/tasksListSlice';
 import { useNavigate } from 'react-router-dom';
 
 import { useMutation } from '@apollo/client';
-import { ADD_TASK, DELETE_ALL_TASKS, EDIT_TASK } from '../../graphql/mutations/tasksList';
+import {
+  ADD_TASK,
+  ADD_TASKS_FROM_CSV,
+  DELETE_ALL_TASKS,
+  EDIT_TASK,
+} from '../../graphql/mutations/tasksList';
 import {
   DELETE_USER,
   LOGIN_USER,
@@ -53,6 +58,7 @@ const Form = ({
     ownAvatar: '',
     password: '',
     passwordRepeated: '',
+    tasksFromCSV: '',
     taskBody: '',
     taskFinishDate: '',
     taskPriority: '',
@@ -68,7 +74,6 @@ const Form = ({
   const user = useSelector((state) => state.auth.user);
 
   const checkWarningData = useRef(null);
-  const elementToSetFocus = useRef(null);
   const lastActiveElement = useRef(null);
   const modalElementToSetFocus = useRef(null);
 
@@ -163,6 +168,21 @@ const Form = ({
     },
   });
 
+  const [addTasksFromCSV, { loading: loadingAddTasksFromCSV }] = useMutation(ADD_TASKS_FROM_CSV, {
+    onError(err) {
+      console.log(err);
+      if (err.graphQLErrors[0] && err.graphQLErrors[0].message) {
+        handleSetErrors(err.graphQLErrors[0].message);
+      } else if (err.graphQLErrors[0] && err.graphQLErrors[0].extensions.errors) {
+        handleSetErrors(err.graphQLErrors[0].extensions.errors);
+      }
+    },
+    refetchQueries: [GET_TASKS, 'Query'],
+    update() {
+      handleFormSent();
+    },
+  });
+
   const [editTask, { loading: loadingEditTask }] = useMutation(EDIT_TASK, {
     onError(err) {
       console.log(err);
@@ -238,8 +258,6 @@ const Form = ({
           modalElementToSetFocus.current.focus();
         }
       }, 100);
-    } else if (elementToSetFocus.current) {
-      elementToSetFocus.current.focus();
     } else if (lastActiveElement.current) {
       setTimeout(() => {
         lastActiveElement.current.focus();
@@ -276,6 +294,14 @@ const Form = ({
   };
 
   const handleUserInput = (e) => {
+    if (formType !== 'loginForm' && formType !== 'registerForm') {
+      const isUserTokenExpired = checkUserTokenValidity();
+      if (isUserTokenExpired) {
+        dispatch(setIsUserTokenExpired(isUserTokenExpired));
+        return;
+      }
+    }
+
     if (e.target) {
       const name = e.target.name;
       if (e.target.type === 'radio') {
@@ -286,8 +312,16 @@ const Form = ({
         setFormData({ ...formData, [name]: value });
         checkWarningData.current = { ...formData, [name]: value };
       }
+    } else if (e.type === 'image/jpeg') {
+      setFormData({ ...formData, avatar: '', ownAvatar: e });
     } else {
-      setFormData({ ...formData, ownAvatar: e });
+      setFormData({
+        ...formData,
+        taskBody: '',
+        taskFinishDate: '',
+        taskPriority: '',
+        tasksFromCSV: e,
+      });
     }
 
     handleClearFormState([setFormWarnings]);
@@ -358,6 +392,12 @@ const Form = ({
             },
           },
         });
+      } else if (formType === 'addTasksFromCSVForm') {
+        addTasksFromCSV({
+          variables: {
+            input: formData.tasksFromCSV,
+          },
+        });
       } else if (formType === 'editTaskForm') {
         editTask({
           variables: {
@@ -398,6 +438,15 @@ const Form = ({
         ...prevState,
         uncategorizedErrors: 'Server error: ' + errors,
       }));
+      return;
+    }
+
+    if (errors[0] && Object.keys(errors[0]).toString() === 'tasksFromCSV') {
+      let tasksFromCSVErrors = [];
+      errors.forEach((error) => {
+        tasksFromCSVErrors.push(error.tasksFromCSV);
+      });
+      setFormErrors({ ...formErrors, tasksFromCSV: tasksFromCSVErrors.join(', ') });
       return;
     }
 
@@ -472,7 +521,6 @@ const Form = ({
             loading={loadingLoginUser}
             loginValue={formData.login}
             passwordValue={formData.password}
-            ref={elementToSetFocus}
             handleErrorInformation={handleErrorInformation}
             handleOpenModal={handleOpenModal}
             handleSubmitForm={handleSubmitForm}
@@ -542,7 +590,9 @@ const Form = ({
             formWarnings={formWarnings}
             editTaskData={editTaskForm && editTaskData}
             loadingAddTask={loadingAddTask}
+            loadingAddTasksFromCSV={loadingAddTasksFromCSV}
             loadingEditTask={loadingEditTask}
+            tasksFromCSV={formData.tasksFromCSV}
             taskBodyValue={formData.taskBody}
             taskFinishDateValue={formData.taskFinishDate}
             taskPriorityValue={formData.taskPriority}

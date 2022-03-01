@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 import Compress from 'compress.js';
 
-import { Form, FormParagraph, UploadAvatar } from '../styles/StyledForm';
+import { Form, FormParagraph, UploadFile } from '../styles/StyledForm';
 import { LoadingSpinner } from '../styles/StyledForm';
 
 import Avatars from './Avatars';
@@ -35,7 +35,11 @@ const AvatarsForm = React.forwardRef(
     }, [setFormType]);
 
     const handleUploadAvatarInput = async (e) => {
-      const resizedImage = await compress.compress([e.target.files[0]], {
+      if (!e.target.files) {
+        return;
+      }
+      const file = e.target.files[0];
+      const resizedImage = await compress.compress([file], {
         size: 2,
         quality: 1,
         maxWidth: 48,
@@ -75,7 +79,7 @@ const AvatarsForm = React.forwardRef(
               </>
             )}
 
-            <UploadAvatar isDarkModeActive={isDarkModeActive}>
+            <UploadFile isDarkModeActive={isDarkModeActive}>
               <label
                 disabled={isLogoutTimeoutModalOpen || loading}
                 htmlFor='ownAvatar'
@@ -92,10 +96,10 @@ const AvatarsForm = React.forwardRef(
                 type='file'
                 onChange={handleUploadAvatarInput}
               />
-            </UploadAvatar>
+            </UploadFile>
             {ownAvatarValue && (
               <FormParagraph isDarkModeActive={isDarkModeActive}>
-                Avatar załadowany, zatwierdź aby zmienić
+                Avatar załadowany poprawnie, zatwierdź aby zmienić
               </FormParagraph>
             )}
             <button disabled={isLogoutTimeoutModalOpen || loading} type='submit'>

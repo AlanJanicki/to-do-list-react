@@ -261,6 +261,7 @@ const ControlPanel = () => {
             </span>
           </ManageButton>
           <Sort
+            disabled={isModalOpen || isLogoutTimeoutModalOpen}
             name='sort'
             value={tasksSortType}
             onChange={(e) => handleSortType(e)}
@@ -288,6 +289,7 @@ const ControlPanel = () => {
             </span>
           </ManageButton>
           <Display
+            disabled={isModalOpen || isLogoutTimeoutModalOpen}
             name='display'
             value={tasksDisplayFilter}
             onChange={(e) => handleDisplayFilter(e)}

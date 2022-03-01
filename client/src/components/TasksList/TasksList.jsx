@@ -13,9 +13,13 @@ import {
 } from '../../redux/tasksListSlice.js';
 import { setIsUserTokenExpired } from '../../redux/authSlice.js';
 
+import { saveAs } from 'file-saver';
+
+import Papa from 'papaparse';
+
 import { Draggable, DragDropContext, Droppable } from 'react-beautiful-dnd';
 
-import { faCheckDouble, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faCheckDouble, faFileExport, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useMutation, useQuery } from '@apollo/client';
@@ -25,8 +29,8 @@ import { GET_TASKS } from '../../graphql/queries/tasksList.js';
 import { checkUserTokenValidity } from '../../utils/checkUserTokenValidity.js';
 
 import {
-  CheckAllTasksOnPage,
   LoadingSpinner,
+  ManageTasks,
   TaskError,
   TasksListWrapper,
 } from './styles/StyledTasksList.js';
@@ -202,6 +206,19 @@ const TasksList = () => {
     }
   };
 
+  const handleExportTasksToCSV = () => {
+    let checkedTasksFiltered = [];
+    checkedTasks.forEach((checkedTask) => {
+      const { __typename, createdAt, done, id, ...rest } = checkedTask;
+      checkedTasksFiltered.push(rest);
+    });
+    const tasksInCSV = Papa.unparse(checkedTasksFiltered);
+
+    const blob = new Blob([tasksInCSV]);
+
+    saveAs(blob, 'lista_zadan.csv');
+  };
+
   return (
     <>
       <DragDropContext onDragEnd={handleDragEnd}>
@@ -259,7 +276,7 @@ const TasksList = () => {
         </Droppable>
       </DragDropContext>
       {tasksList.length > 0 && !isOrderUpdatingActive && (
-        <CheckAllTasksOnPage tasksList={tasksList} checkedTasks={checkedTasks}>
+        <ManageTasks tasksList={tasksList} checkedTasks={checkedTasks}>
           {tasksList.length > 1 && checkedTasks.length < tasksList.length && (
             <button
               disabled={isModalOpen || isLogoutTimeoutModalOpen}
@@ -270,14 +287,23 @@ const TasksList = () => {
           )}
 
           {tasksList.length > 1 && checkedTasks.length === tasksList.length && (
-            <button
-              disabled={isModalOpen || isLogoutTimeoutModalOpen}
-              title={'Odznacz wszystkie zadania na stronie'}
-              onClick={() => handleCheckAllTasksOnPage('unCheck')}>
-              <FontAwesomeIcon icon={faTimes} />
-            </button>
+            <>
+              <button
+                disabled={isModalOpen || isLogoutTimeoutModalOpen}
+                title={'Odznacz wszystkie zadania na stronie'}
+                onClick={() => handleCheckAllTasksOnPage('unCheck')}>
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+            </>
           )}
-        </CheckAllTasksOnPage>
+
+          <button
+            disabled={isModalOpen || isLogoutTimeoutModalOpen || checkedTasks.length === 0}
+            title={'Wyeskportuj zadania do pliku CSV'}
+            onClick={handleExportTasksToCSV}>
+            <FontAwesomeIcon icon={faFileExport} />
+          </button>
+        </ManageTasks>
       )}
 
       <Pagination isOrderUpdatingActive={isOrderUpdatingActive} />

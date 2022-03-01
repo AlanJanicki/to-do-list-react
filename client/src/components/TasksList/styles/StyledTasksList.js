@@ -76,7 +76,7 @@ export const LoadingSpinner = styled.div`
   }
 `;
 
-export const CheckAllTasksOnPage = styled.div`
+export const ManageTasks = styled.div`
   display: flex;
   justify-content: center;
   margin: 0 auto 15px auto;
@@ -105,6 +105,10 @@ export const CheckAllTasksOnPage = styled.div`
       &:hover {
         color: ${(props) =>
           props.tasksList.length === props.checkedTasks.length ? 'red' : '#00b044'};
+      }
+
+      &:nth-of-type(2):hover {
+        color: ${(props) => (props.checkedTasks.length > 0 ? '#00b044' : '#919191')};
       }
     }
   }

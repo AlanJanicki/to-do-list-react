@@ -6,6 +6,12 @@ export const ADD_TASK = gql`
   }
 `;
 
+export const ADD_TASKS_FROM_CSV = gql`
+  mutation AddTasksFromCSV($input: [TaskInput]!) {
+    addTasksFromCSV(input: $input)
+  }
+`;
+
 export const DELETE_TASKS = gql`
   mutation DeleteTasks($input: [ID]!) {
     deleteTasks(input: $input)

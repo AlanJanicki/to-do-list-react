@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import TasksList from '../../models/TasksList.js';
 
-import { validateTaskInput } from '../../utils/validator.js';
+import { validateTasksFromCSVInput, validateTaskInput } from '../../utils/validator.js';
 import verifyAuth from '../../utils/verifyAuth.js';
 
 const taskslist = {
@@ -32,6 +32,48 @@ const taskslist = {
             errors: [
               {
                 uncategorizedErrors: 'Nie udało się dodać zadania. Spróbuj ponownie.',
+              },
+            ],
+          });
+        }
+      } else {
+        throw new UserInputError('', {
+          errors: [
+            {
+              uncategorizedErrors: 'Nie odnaleziono tablicy zadań dla użytkownika',
+            },
+          ],
+        });
+      }
+    },
+
+    async addTasksFromCSV(_, { input }, context) {
+      const user = verifyAuth(context);
+      const errors = validateTasksFromCSVInput(input);
+      if (errors.length > 0) {
+        throw new UserInputError('', { errors });
+      }
+
+      const tasksList = await TasksList.findOne({ userId: user.id });
+      if (tasksList) {
+        input.forEach((task) =>
+          tasksList.tasks.push({
+            body: task.body,
+            createdAt: new Date().toISOString(),
+            done: false,
+            id: uuidv4(),
+            finishDate: task.finishDate,
+            priority: task.priority,
+          })
+        );
+
+        try {
+          await tasksList.save();
+        } catch (error) {
+          throw new UserInputError('', {
+            errors: [
+              {
+                uncategorizedErrors: 'Nie udało się dodać zadań hurtowo. Spróbuj ponownie.',
               },
             ],
           });

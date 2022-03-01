@@ -92,6 +92,47 @@ export const handleValidateInput = (formData) => {
         warnings.push({ taskBody: 'Osiągnięto maksymalną liczbę znaków' });
       }
     }
+
+    if (formData.tasksArray) {
+      formData.tasksArray.forEach((task) => {
+        const taskTrimmedName = task.body.substring(0, 10);
+
+        if (task.body.trim().length < 5) {
+          errors.push({
+            tasksFromCSV: `Zadanie ${taskTrimmedName + '...'} musi posiadać min. 5 znaków`,
+          });
+        }
+
+        if (task.body.length > 100) {
+          errors.push({
+            tasksFromCSV: `Zadanie ${
+              taskTrimmedName + '...'
+            } przekracza maksymalną liczbę znaków (100)`,
+          });
+        }
+
+        if (task.finishDate && isNaN(new Date(task.finishDate).getTime())) {
+          errors.push({
+            tasksFromCSV: `Zadanie ${
+              taskTrimmedName + '...'
+            } posiada nieprawidłowy format daty zakończenia`,
+          });
+        }
+
+        if (
+          task.priority !== '' &&
+          task.priority !== '1' &&
+          task.priority !== '2' &&
+          task.priority !== '3'
+        ) {
+          errors.push({
+            tasksFromCSV: `Zadanie ${
+              taskTrimmedName + '...'
+            } posiada nieprawidłowy format priorytetu (dopuszczalny: 1 / 2 / 3 lub brak)`,
+          });
+        }
+      });
+    }
   }
   return { errors, warnings };
 };

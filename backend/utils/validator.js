@@ -128,13 +128,49 @@ export const validateTaskInput = (body, finishDate, priority) => {
     errors.push({ taskBody: 'Zadanie musi posiadać min. 5 znaków' });
   }
 
-  if (finishDate && typeof finishDate !== 'string') {
+  if (finishDate && (typeof finishDate !== 'string' || isNaN(new Date(finishDate).getTime()))) {
     errors.push({ taskFinishDate: 'Nieprawidłowy format daty zakończenia zadania' });
   }
 
   if (priority && typeof priority !== 'string') {
-    errors.push({ taskPriority: 'Nieprawidłowy format statusu zadania' });
+    errors.push({ taskPriority: 'Nieprawidłowy format priorytetu zadania' });
   }
 
+  return errors;
+};
+
+export const validateTasksFromCSVInput = (tasks) => {
+  const errors = [];
+
+  tasks.forEach((task) => {
+    const taskTrimmedName = task.body.substring(0, 10);
+
+    if (typeof task.body !== 'string') {
+      errors.push({
+        tasksFromCSV: `Zadanie ${taskTrimmedName + '...'} posiada nieprawidłowy format`,
+      });
+    } else if (task.body.trim().length < 5) {
+      errors.push({
+        tasksFromCSV: `Zadanie ${taskTrimmedName + '...'} musi posiadać min. 5 znaków`,
+      });
+    }
+
+    if (
+      task.finishDate &&
+      (typeof task.finishDate !== 'string' || isNaN(new Date(task.finishDate).getTime()))
+    ) {
+      errors.push({
+        tasksFromCSV: `Zadanie ${
+          taskTrimmedName + '...'
+        } posiada nieprawidłowy format daty zakończenia`,
+      });
+    }
+
+    if (task.priority && typeof task.priority !== 'string') {
+      errors.push({
+        tasksFromCSV: `Zadanie ${taskTrimmedName + '...'} posiada nieprawidłowy format priorytetu`,
+      });
+    }
+  });
   return errors;
 };

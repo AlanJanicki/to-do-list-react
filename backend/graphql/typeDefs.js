@@ -62,6 +62,7 @@ const typeDefs = gql`
 
   type Mutation {
     addTask(input: TaskInput!): Boolean
+    addTasksFromCSV(input: [TaskInput]!): Boolean
     deleteTasks(input: [ID]!): Boolean
     deleteAllTasks: Boolean
     deleteUser: Boolean

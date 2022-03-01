@@ -77,14 +77,15 @@ const Modal = ({
 
   const handleCloseLogoutTimeoutModal = (e) => {
     e.preventDefault();
-
     if (isUserInactive) {
       handleAutoLogout();
     } else if (lastActiveElement) {
-      if (lastActiveElement.current) {
-        lastActiveElement.current.focus();
-      }
       dispatch(closeLogoutTimeoutModal());
+      if (lastActiveElement.current) {
+        setTimeout(() => {
+          lastActiveElement.current.focus();
+        }, 100);
+      }
       setTimeout(() => {
         dispatch(setUserAutoLoggedOut(false));
       }, 500);

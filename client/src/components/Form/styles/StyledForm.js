@@ -340,7 +340,7 @@ export const LoadingSpinner = styled.span`
   }
 `;
 
-export const UploadAvatar = styled.div`
+export const UploadFile = styled.div`
   display: flex;
   justify-content: center;
   width: 100%;
