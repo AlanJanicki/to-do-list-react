@@ -402,7 +402,7 @@ const taskslist = {
       }
 
       const filteredTasksList = tasksList.tasks
-        .filter((task) => task.body.includes(searchedTask.toLowerCase()))
+        .filter((task) => task.body.toLowerCase().includes(searchedTask.toLowerCase()))
         .filter((task) => {
           if (displayFilter === 'done') {
             return task.done === true;

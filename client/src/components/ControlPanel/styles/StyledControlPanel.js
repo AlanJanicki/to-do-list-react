@@ -6,7 +6,7 @@ export const Wrapper = styled.div`
   position: fixed;
   z-index: 2;
   top: ${(props) => `${props.headerHeight}px`};
-  display: flex;
+  display: ${(props) => (!props.headerHeight ? 'none' : 'flex')};
   justify-content: center;
   flex-wrap: wrap;
   width: 100%;
@@ -56,9 +56,7 @@ export const Welcome = styled.div`
     width: 48px;
     height: ${(props) => (props.ownAvatar.length === 0 ? '54px' : '100%')};
     background-image: ${(props) =>
-      props.ownAvatar.length > 0
-        ? `url(http://localhost:4002/static/${props.ownAvatar})`
-        : `url(${avatars})`};
+      props.ownAvatar.length > 0 ? `url(/static/${props.ownAvatar})` : `url(${avatars})`};
     background-position: ${(props) =>
       props.ownAvatar.length === 0 ? `${-(props.avatar * 48)}px 0px` : 'center'};
     background-size: ${(props) => props.ownAvatar.length === 0 && 'cover'};

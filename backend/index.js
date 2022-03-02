@@ -9,7 +9,7 @@ import path from 'path';
 import resolvers from './graphql/resolvers/index.js';
 import typeDefs from './graphql/typeDefs.js';
 
-const PORT = process.env.port || 4002;
+const PORT = process.env.PORT || 4002;
 const __dirname = path.resolve();
 
 const server = new ApolloServer({ typeDefs, resolvers, context: ({ req }) => ({ req }) });

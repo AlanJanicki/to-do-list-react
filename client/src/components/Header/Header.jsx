@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsUserTokenExpired, setUser } from '../../redux/authSlice';
@@ -46,8 +46,12 @@ const Header = () => {
       },
     });
 
-  useLayoutEffect(() => {
-    dispatch(setHeaderHeight(header.current.getBoundingClientRect().height));
+  useEffect(() => {
+    if (header.current) {
+      setTimeout(() => {
+        dispatch(setHeaderHeight(header.current.getBoundingClientRect().height));
+      }, 1);
+    }
   }, [dispatch, windowWidth]);
 
   useEffect(() => {

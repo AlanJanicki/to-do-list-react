@@ -116,7 +116,9 @@ const Pagination = ({ isOrderUpdatingActive }) => {
 
   return (
     <>
-      {(tasksFilteredAmount < tasksPerPage && tasksAmount !== tasksPerPage) ||
+      {(tasksFilteredAmount < tasksPerPage &&
+        tasksFilteredAmount < 10 &&
+        tasksAmount !== tasksPerPage) ||
       (isOrderUpdatingActive && tasksListPage > 1)
         ? null
         : !tasksListErrors &&

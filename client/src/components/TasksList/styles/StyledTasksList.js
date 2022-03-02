@@ -100,20 +100,26 @@ export const ManageTasks = styled.div`
     &:focus-visible {
       outline: 1px solid #ee7300;
     }
-
-    @media (hover: hover) {
-      &:hover {
-        color: ${(props) =>
-          props.tasksList.length === props.checkedTasks.length ? 'red' : '#00b044'};
-      }
-
-      &:nth-of-type(2):hover {
-        color: ${(props) => (props.checkedTasks.length > 0 ? '#00b044' : '#919191')};
-      }
-    }
   }
 
   @media print {
     display: none;
+  }
+`;
+
+export const CheckTasks = styled.button`
+  @media (hover: hover) {
+    &:hover {
+      color: ${(props) =>
+        props.tasksList.length === props.checkedTasks.length ? 'red' : '#00b044'};
+    }
+  }
+`;
+
+export const ExportTasks = styled.button`
+  @media (hover: hover) {
+    &:hover {
+      color: ${(props) => (props.checkedTasks.length > 0 ? '#00b044' : '#919191')};
+    }
   }
 `;

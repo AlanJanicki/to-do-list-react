@@ -29,6 +29,8 @@ import { GET_TASKS } from '../../graphql/queries/tasksList.js';
 import { checkUserTokenValidity } from '../../utils/checkUserTokenValidity.js';
 
 import {
+  CheckTasks,
+  ExportTasks,
   LoadingSpinner,
   ManageTasks,
   TaskError,
@@ -276,33 +278,38 @@ const TasksList = () => {
         </Droppable>
       </DragDropContext>
       {tasksList.length > 0 && !isOrderUpdatingActive && (
-        <ManageTasks tasksList={tasksList} checkedTasks={checkedTasks}>
+        <ManageTasks>
           {tasksList.length > 1 && checkedTasks.length < tasksList.length && (
-            <button
+            <CheckTasks
               disabled={isModalOpen || isLogoutTimeoutModalOpen}
               title={'Zaznacz wszystkie zadania na stronie'}
+              checkedTasks={checkedTasks}
+              tasksList={tasksList}
               onClick={() => handleCheckAllTasksOnPage('check')}>
               <FontAwesomeIcon icon={faCheckDouble} />
-            </button>
+            </CheckTasks>
           )}
 
           {tasksList.length > 1 && checkedTasks.length === tasksList.length && (
             <>
-              <button
+              <CheckTasks
                 disabled={isModalOpen || isLogoutTimeoutModalOpen}
+                checkedTasks={checkedTasks}
+                tasksList={tasksList}
                 title={'Odznacz wszystkie zadania na stronie'}
                 onClick={() => handleCheckAllTasksOnPage('unCheck')}>
                 <FontAwesomeIcon icon={faTimes} />
-              </button>
+              </CheckTasks>
             </>
           )}
 
-          <button
+          <ExportTasks
             disabled={isModalOpen || isLogoutTimeoutModalOpen || checkedTasks.length === 0}
             title={'Wyeskportuj zadania do pliku CSV'}
+            checkedTasks={checkedTasks}
             onClick={handleExportTasksToCSV}>
             <FontAwesomeIcon icon={faFileExport} />
-          </button>
+          </ExportTasks>
         </ManageTasks>
       )}
 

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { removeUser } from '../../redux/authSlice';
@@ -30,8 +30,12 @@ const AccountMenu = () => {
 
   const windowWidth = useWindowWidth();
 
-  useLayoutEffect(() => {
-    dispatch(setAccountMenuHeight(accountMenu.current.getBoundingClientRect().height));
+  useEffect(() => {
+    if (accountMenu.current) {
+      setTimeout(() => {
+        dispatch(setAccountMenuHeight(accountMenu.current.getBoundingClientRect().height));
+      }, 1);
+    }
   }, [dispatch, windowWidth]);
 
   useEffect(() => {

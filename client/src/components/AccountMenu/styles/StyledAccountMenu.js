@@ -3,16 +3,11 @@ import styled from 'styled-components';
 export const Menu = styled.ul`
   position: fixed;
   z-index: 1;
-  top: ${(props) => {
-    if (props.controlPanelHeight && props.headerHeight) {
-      return props.isAccountMenuOpen
-        ? `${props.headerHeight + props.controlPanelHeight}px`
-        : `-${props.headerHeight + props.controlPanelHeight}px`;
-    } else {
-      return '-1000px';
-    }
-  }};
-  display: flex;
+  top: ${(props) =>
+    props.isAccountMenuOpen
+      ? `${props.headerHeight + props.controlPanelHeight}px`
+      : `-${props.headerHeight + props.controlPanelHeight}px`};
+  display: ${(props) => (props.controlPanelHeight && props.headerHeight ? 'flex' : 'none')};
   flex-wrap: wrap;
   width: 100%;
   max-width: 1400px;

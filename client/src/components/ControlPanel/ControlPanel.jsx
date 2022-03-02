@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsUserTokenExpired } from '../../redux/authSlice';
@@ -75,8 +75,12 @@ const ControlPanel = () => {
     refetchQueries: [GET_TASKS, 'Query'],
   });
 
-  useLayoutEffect(() => {
-    dispatch(setControlPanelHeight(controlPanel.current.getBoundingClientRect().height));
+  useEffect(() => {
+    if (controlPanel.current) {
+      setTimeout(() => {
+        dispatch(setControlPanelHeight(controlPanel.current.getBoundingClientRect().height));
+      }, 1);
+    }
   }, [dispatch, showDisplaySelect, showSortSelect, tasksList, windowWidth, user.ownAvatar]);
 
   const handleUncheckFilteredTasks = useCallback(() => {
