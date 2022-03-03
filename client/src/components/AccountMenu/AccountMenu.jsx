@@ -34,7 +34,7 @@ const AccountMenu = () => {
     if (accountMenu.current) {
       setTimeout(() => {
         dispatch(setAccountMenuHeight(accountMenu.current.getBoundingClientRect().height));
-      }, 1);
+      }, 100);
     }
   }, [dispatch, windowWidth]);
 

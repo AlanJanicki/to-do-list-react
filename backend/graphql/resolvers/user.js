@@ -1,11 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-
 import { UserInputError } from 'apollo-server-express';
 import bcrypt from 'bcryptjs';
-import { GraphQLUpload } from 'graphql-upload';
 import jwt from 'jsonwebtoken';
-import { v4 as uuidv4 } from 'uuid';
 
 import TasksList from '../../models/TasksList.js';
 import User from '../../models/User.js';
@@ -35,8 +30,6 @@ const generateToken = (user) => {
 };
 
 const user = {
-  Upload: GraphQLUpload,
-
   Mutation: {
     async deleteUser(_, __, context) {
       const user = verifyAuth(context);
@@ -122,7 +115,7 @@ const user = {
         enabledDarkMode: user.enabledDarkMode,
         id: user.id,
         name: user.name,
-        ownAvatar: user.ownAvatar.length > 0 ? user.ownAvatar : '',
+        ownAvatar: user.ownAvatar,
         token,
       };
     },
@@ -220,7 +213,7 @@ const user = {
         enabledDarkMode: res.enabledDarkMode,
         id: res.id,
         name: res.name,
-        ownAvatar: res.ownAvatar.length > 0 ? res.ownAvatar : '',
+        ownAvatar: res.ownAvatar,
         token,
       };
     },
@@ -281,17 +274,14 @@ const user = {
         enabledDarkMode: res.enabledDarkMode,
         id: res.id,
         name: res.name,
-        ownAvatar: res.ownAvatar.length > 0 ? res.ownAvatar : '',
+        ownAvatar: res.ownAvatar,
         token,
       };
     },
 
     async updateUserAvatar(_, { avatar, ownAvatar }, context) {
       const user = verifyAuth(context);
-      const __dirname = path.resolve();
-      let ownAvatarName;
-
-      const errors = validateChangeAvatarInput(avatar, ownAvatar.file);
+      const errors = validateChangeAvatarInput(avatar, ownAvatar);
       if (errors.length > 0) {
         throw new UserInputError('', { errors });
       }
@@ -307,18 +297,10 @@ const user = {
         });
       }
 
-      if (ownAvatar) {
-        ownAvatarName = 'avatar' + uuidv4();
-        const { createReadStream } = await ownAvatar.file;
-        const stream = createReadStream();
-        const pathName = path.join(__dirname, `/public/images/${ownAvatarName}`);
-        await stream.pipe(fs.createWriteStream(pathName));
-      }
-
       let res;
       try {
         if (ownAvatar) {
-          res = await User.findByIdAndUpdate(user.id, { ownAvatar: ownAvatarName }, { new: true });
+          res = await User.findByIdAndUpdate(user.id, { ownAvatar: ownAvatar }, { new: true });
         } else {
           res = await User.findByIdAndUpdate(user.id, { avatar, ownAvatar: '' }, { new: true });
         }
@@ -339,7 +321,7 @@ const user = {
         enabledDarkMode: res.enabledDarkMode,
         id: res.id,
         name: res.name,
-        ownAvatar: res.ownAvatar.length > 0 ? res.ownAvatar : '',
+        ownAvatar: res.ownAvatar,
         token,
       };
     },

@@ -16,6 +16,7 @@ const AvatarsForm = React.forwardRef(
       avatarValue,
       formErrors,
       formSentSuccessfully,
+      isOwnAvatarChangeInProgress,
       handleErrorInformation,
       handleSubmitForm,
       handleUserInput,
@@ -79,11 +80,24 @@ const AvatarsForm = React.forwardRef(
               </>
             )}
 
+            {ownAvatarValue && (
+              <FormParagraph isDarkModeActive={isDarkModeActive}>
+                Avatar załadowany poprawnie, zatwierdź aby zmienić
+              </FormParagraph>
+            )}
+            <button
+              disabled={isLogoutTimeoutModalOpen || loading || isOwnAvatarChangeInProgress}
+              type='submit'>
+              {!ownAvatarValue ? 'Wybierz' : 'Zatwierdź'}{' '}
+              {loading || (isOwnAvatarChangeInProgress && <LoadingSpinner />)}
+            </button>
             <UploadFile isDarkModeActive={isDarkModeActive}>
               <label
-                disabled={isLogoutTimeoutModalOpen || loading}
+                disabled={isLogoutTimeoutModalOpen || loading || isOwnAvatarChangeInProgress}
                 htmlFor='ownAvatar'
-                tabIndex={isLogoutTimeoutModalOpen || loading ? '-1' : '0'}
+                tabIndex={
+                  isLogoutTimeoutModalOpen || loading || isOwnAvatarChangeInProgress ? '-1' : '0'
+                }
                 onKeyDown={(e) => handleKeyboardOperation(e)}>
                 Wgraj swój własny avatar
                 <br />
@@ -97,14 +111,6 @@ const AvatarsForm = React.forwardRef(
                 onChange={handleUploadAvatarInput}
               />
             </UploadFile>
-            {ownAvatarValue && (
-              <FormParagraph isDarkModeActive={isDarkModeActive}>
-                Avatar załadowany poprawnie, zatwierdź aby zmienić
-              </FormParagraph>
-            )}
-            <button disabled={isLogoutTimeoutModalOpen || loading} type='submit'>
-              {!ownAvatarValue ? 'Wybierz' : 'Zatwierdź'} {loading && <LoadingSpinner />}
-            </button>
           </Form>
         )}
       </>

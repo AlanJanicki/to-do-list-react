@@ -83,7 +83,6 @@ export const ManageTasks = styled.div`
 
   button {
     padding: 5px 15px;
-    color: #919191;
     background: none;
     border: none;
     font-size: 1.2rem;
@@ -108,6 +107,8 @@ export const ManageTasks = styled.div`
 `;
 
 export const CheckTasks = styled.button`
+  color: ${(props) => (props.tasksList.length === props.checkedTasks.length ? 'red' : '#919191')};
+
   @media (hover: hover) {
     &:hover {
       color: ${(props) =>
@@ -117,6 +118,8 @@ export const CheckTasks = styled.button`
 `;
 
 export const ExportTasks = styled.button`
+  color: ${(props) => (props.checkedTasks.length > 0 ? '#00b044' : '#919191')};
+
   @media (hover: hover) {
     &:hover {
       color: ${(props) => (props.checkedTasks.length > 0 ? '#00b044' : '#919191')};

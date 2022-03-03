@@ -171,6 +171,20 @@ const TaskForm = React.forwardRef(
         {formErrors.tasksFromCSV && (
           <FormParagraph error={true}>{formErrors.tasksFromCSV}</FormParagraph>
         )}
+        {tasksFromCSV.length > 0 && formErrors.tasksFromCSV.length === 0 && (
+          <FormParagraph isDarkModeActive={isDarkModeActive}>
+            Zadania z pliku załadowane poprawnie, zatwierdź aby dodać
+          </FormParagraph>
+        )}
+
+        <button disabled={isLogoutTimeoutModalOpen || loadingAddTask} type='submit'>
+          {addTaskForm && tasksFromCSV.length === 0
+            ? 'Dodaj zadanie'
+            : tasksFromCSV.length === 0 && 'Edytuj zadanie'}
+          {tasksFromCSV.length > 0 && 'Zatwierdź'}
+          {(loadingAddTask || loadingEditTask || loadingAddTasksFromCSV) && <LoadingSpinner />}
+        </button>
+
         {!editTaskForm && (
           <UploadFile isDarkModeActive={isDarkModeActive}>
             <label
@@ -189,19 +203,6 @@ const TaskForm = React.forwardRef(
             />
           </UploadFile>
         )}
-
-        {tasksFromCSV.length > 0 && formErrors.tasksFromCSV.length === 0 && (
-          <FormParagraph isDarkModeActive={isDarkModeActive}>
-            Zadania z pliku załadowane poprawnie, zatwierdź aby dodać
-          </FormParagraph>
-        )}
-        <button disabled={isLogoutTimeoutModalOpen || loadingAddTask} type='submit'>
-          {addTaskForm && tasksFromCSV.length === 0
-            ? 'Dodaj zadanie'
-            : tasksFromCSV.length === 0 && 'Edytuj zadanie'}
-          {tasksFromCSV.length > 0 && 'Zatwierdź'}
-          {(loadingAddTask || loadingEditTask || loadingAddTasksFromCSV) && <LoadingSpinner />}
-        </button>
       </Form>
     );
   }

@@ -56,7 +56,7 @@ export const Welcome = styled.div`
     width: 48px;
     height: ${(props) => (props.ownAvatar.length === 0 ? '54px' : '100%')};
     background-image: ${(props) =>
-      props.ownAvatar.length > 0 ? `url(/static/${props.ownAvatar})` : `url(${avatars})`};
+      props.ownAvatar.length > 0 ? `url(${props.ownAvatar})` : `url(${avatars})`};
     background-position: ${(props) =>
       props.ownAvatar.length === 0 ? `${-(props.avatar * 48)}px 0px` : 'center'};
     background-size: ${(props) => props.ownAvatar.length === 0 && 'cover'};

@@ -79,7 +79,7 @@ const ControlPanel = () => {
     if (controlPanel.current) {
       setTimeout(() => {
         dispatch(setControlPanelHeight(controlPanel.current.getBoundingClientRect().height));
-      }, 1);
+      }, 100);
     }
   }, [dispatch, showDisplaySelect, showSortSelect, tasksList, windowWidth, user.ownAvatar]);
 

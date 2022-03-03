@@ -39,7 +39,7 @@ export const REGISTER_USER = gql`
 `;
 
 export const UPDATE_USER_AVATAR = gql`
-  mutation UpdateUserAvatar($avatar: String, $ownAvatar: Upload) {
+  mutation UpdateUserAvatar($avatar: String, $ownAvatar: String) {
     updateUserAvatar(avatar: $avatar, ownAvatar: $ownAvatar) {
       avatar
       enabledDarkMode

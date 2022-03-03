@@ -24,8 +24,19 @@ import {
 } from '../../graphql/mutations/user';
 import { GET_TASKS } from '../../graphql/queries/tasksList';
 
+import { initializeApp } from 'firebase/app';
+import {
+  deleteObject,
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from 'firebase/storage';
+
 import { checkUserTokenValidity } from '../../utils/checkUserTokenValidity';
 import { handleValidateInput } from '../../utils/formValidator';
+
+import { fireBaseConfig } from '../../config/firebaseConfig';
 
 import { FormParagraph } from './styles/StyledForm';
 
@@ -69,6 +80,7 @@ const Form = ({
   const [formType, setFormType] = useState(null);
   const [formSentSuccessfully, setFormSentSuccessfully] = useState(false);
   const [formWarnings, setFormWarnings] = useState(initFormDataState);
+  const [isOwnAvatarChangeInProgress, setIsOwnAvatarChangeInProgess] = useState(false);
 
   const isModalOpen = useSelector((state) => state.modal.isModalOpen);
   const user = useSelector((state) => state.auth.user);
@@ -80,6 +92,9 @@ const Form = ({
   const dispatch = useDispatch();
 
   let navigate = useNavigate();
+
+  const app = initializeApp(fireBaseConfig);
+  const storage = getStorage(app);
 
   const [loginUser, { data: dataLoginUser, loading: loadingLoginUser }] = useMutation(LOGIN_USER, {
     onError(err) {
@@ -136,6 +151,9 @@ const Form = ({
       },
       update() {
         handleFormSent();
+        if (isOwnAvatarChangeInProgress) {
+          setIsOwnAvatarChangeInProgess(false);
+        }
       },
     });
 
@@ -374,10 +392,36 @@ const Form = ({
             },
           ]);
           return;
-        } else {
+        } else if (formData.avatar) {
+          if (user.ownAvatar.length > 0) {
+            const avatarForDelete = ref(storage, `avatars/${user.id}`);
+            deleteObject(avatarForDelete);
+          }
           updateUserAvatar({
-            variables: { avatar: formData.avatar, ownAvatar: formData.ownAvatar },
+            variables: { avatar: formData.avatar },
           });
+        } else {
+          const StorageRef = ref(storage, `avatars/${user.id}`);
+          const uploadAvatar = uploadBytesResumable(StorageRef, formData.ownAvatar);
+
+          uploadAvatar.on(
+            'state_changed',
+            () => {
+              setIsOwnAvatarChangeInProgess(true);
+            },
+            (error) => {
+              if (error.code) {
+                handleSetErrors(error.code);
+              }
+            },
+            () => {
+              getDownloadURL(uploadAvatar.snapshot.ref).then((downloadURL) => {
+                updateUserAvatar({
+                  variables: { ownAvatar: downloadURL },
+                });
+              });
+            }
+          );
         }
       } else if (formType === 'confirmFormAccount') {
         deleteUser();
@@ -553,6 +597,7 @@ const Form = ({
             avatarValue={formData.avatar}
             formErrors={formErrors}
             formSentSuccessfully={formSentSuccessfully}
+            isOwnAvatarChangeInProgress={isOwnAvatarChangeInProgress}
             loading={loadingUpdateUserAvatar}
             ownAvatarValue={formData.ownAvatar}
             ref={modalElementToSetFocus}

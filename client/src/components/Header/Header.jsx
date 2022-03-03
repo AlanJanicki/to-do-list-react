@@ -50,7 +50,7 @@ const Header = () => {
     if (header.current) {
       setTimeout(() => {
         dispatch(setHeaderHeight(header.current.getBoundingClientRect().height));
-      }, 1);
+      }, 100);
     }
   }, [dispatch, windowWidth]);
 
