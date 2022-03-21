@@ -21,7 +21,8 @@
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://musing-brahmagupta-f9fbe6.netlify.app/)
+[![Product Name Screen Shot][product-screenshot1]](https://musing-brahmagupta-f9fbe6.netlify.app/)
+[![Product Name Screen Shot][product-screenshot2]](https://musing-brahmagupta-f9fbe6.netlify.app/)
 
 Simple task manager, which lets create own account and manage tasks across different devices like computers, mobiles, tablets (app is responsive designed).
 
@@ -84,4 +85,5 @@ Project Link: [https://github.com/AlanJanicki/to-do-list-react](https://github.c
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-[product-screenshot]: images/screenshot.png
+[product-screenshot1]: /preview-1.png
+[product-screenshot2]: /preview-2.png
