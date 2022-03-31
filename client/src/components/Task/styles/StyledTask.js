@@ -8,6 +8,7 @@ export const TaskWrapper = styled.li`
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+  max-width: 100%;
   row-gap: 10px;
   padding-bottom: 15px;
   border-bottom: 1px solid #dfe0df;
@@ -48,6 +49,8 @@ export const TaskWrapper = styled.li`
   }
 
   h3 {
+    max-width: 100%;
+    word-wrap: break-word;
     color: ${(props) => props.done && '#919191'};
     text-align: center;
     text-decoration: ${(props) => props.done && 'line-through'};
