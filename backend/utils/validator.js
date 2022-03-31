@@ -1,9 +1,11 @@
+const STRING_TYPE = 'string';
+
 const passRegex =
   /^(?=[^A-Z\n]*[A-Z])(?=[^a-z\n]*[a-z])(?=[^0-9\n]*[0-9])(?=[^#?!@$%^&*\n-]*[#?!@$%^&*-]).{8,20}$/;
 
 export const validateLoginInput = (login, password) => {
   const errors = [];
-  if (typeof login !== 'string') {
+  if (typeof login !== STRING_TYPE) {
     errors.push({ login: 'Nieprawidłowy format loginu' });
   } else if (login.trim().length < 3) {
     errors.push({ login: 'Login musi posiadać min. 3 znaki' });
@@ -11,7 +13,7 @@ export const validateLoginInput = (login, password) => {
     errors.push({ login: 'Login nie może zawierać spacji' });
   }
 
-  if (typeof password !== 'string') {
+  if (typeof password !== STRING_TYPE) {
     errors.push({ password: 'Nieprawidłowy format hasła' });
   } else if (!password.match(passRegex)) {
     errors.push({
@@ -28,11 +30,11 @@ export const validateLoginInput = (login, password) => {
 export const validateRegisterInput = (avatar, login, name, password, passwordRepeated) => {
   const errors = [];
 
-  if (typeof avatar !== 'string') {
+  if (typeof avatar !== STRING_TYPE) {
     errors.push({ avatar: 'Nieprawidłowy format avatara' });
   }
 
-  if (typeof name !== 'string') {
+  if (typeof name !== STRING_TYPE) {
     errors.push({ name: 'Nieprawidłowy format imienia' });
   } else if (name.trim().length < 3) {
     errors.push({ name: 'Imię musi posiadać min. 3 znaki' });
@@ -43,7 +45,7 @@ export const validateRegisterInput = (avatar, login, name, password, passwordRep
   const loginErrors = validateLoginInput(login, password);
   loginErrors.forEach((error) => errors.push(error));
 
-  if (typeof passwordRepeated !== 'string') {
+  if (typeof passwordRepeated !== STRING_TYPE) {
     errors.push({ passwordRepeated: 'Nieprawidłowy format powtórzonego hasła' });
   } else if (!passwordRepeated.match(passRegex)) {
     errors.push({
@@ -61,11 +63,11 @@ export const validateRegisterInput = (avatar, login, name, password, passwordRep
 export const validateChangeAvatarInput = (avatar, ownAvatar) => {
   const errors = [];
 
-  if (avatar && typeof avatar !== 'string') {
+  if (avatar && typeof avatar !== STRING_TYPE) {
     errors.push({ avatar: 'Nieprawidłowy format avatara' });
   }
 
-  if (ownAvatar && typeof ownAvatar !== 'string') {
+  if (ownAvatar && typeof ownAvatar !== STRING_TYPE) {
     errors.push({ ownAvatar: 'Nieprawidłowy format avatara' });
   }
 
@@ -75,7 +77,7 @@ export const validateChangeAvatarInput = (avatar, ownAvatar) => {
 export const validateChangePasswordInput = (oldPassword, newPassword, newPasswordRepeated) => {
   const errors = [];
 
-  if (typeof oldPassword !== 'string') {
+  if (typeof oldPassword !== STRING_TYPE) {
     errors.push({ oldPassword: 'Nieprawidłowy format starego hasła' });
   } else if (!oldPassword.match(passRegex)) {
     errors.push({
@@ -86,7 +88,7 @@ export const validateChangePasswordInput = (oldPassword, newPassword, newPasswor
     errors.push({ oldPassword: 'Stare hasło nie może zawierać spacji' });
   }
 
-  if (typeof newPassword !== 'string') {
+  if (typeof newPassword !== STRING_TYPE) {
     errors.push({ newPassword: 'Nieprawidłowy format nowego hasła' });
   } else if (!newPassword.match(passRegex)) {
     errors.push({
@@ -97,7 +99,7 @@ export const validateChangePasswordInput = (oldPassword, newPassword, newPasswor
     errors.push({ newPassword: 'Nowe hasło nie może zawierać spacji' });
   }
 
-  if (typeof newPasswordRepeated !== 'string') {
+  if (typeof newPasswordRepeated !== STRING_TYPE) {
     errors.push({ newPasswordRepeated: 'Nieprawidłowy format powtórzonego hasła' });
   } else if (!newPasswordRepeated.match(passRegex)) {
     errors.push({
@@ -116,17 +118,17 @@ export const validateChangePasswordInput = (oldPassword, newPassword, newPasswor
 export const validateTaskInput = (body, finishDate, priority) => {
   const errors = [];
 
-  if (typeof body !== 'string') {
+  if (typeof body !== STRING_TYPE) {
     errors.push({ taskBody: 'Nieprawidłowy format zadania' });
   } else if (body.trim().length < 5) {
     errors.push({ taskBody: 'Zadanie musi posiadać min. 5 znaków' });
   }
 
-  if (finishDate && (typeof finishDate !== 'string' || isNaN(new Date(finishDate).getTime()))) {
+  if (finishDate && (typeof finishDate !== STRING_TYPE || isNaN(new Date(finishDate).getTime()))) {
     errors.push({ taskFinishDate: 'Nieprawidłowy format daty zakończenia zadania' });
   }
 
-  if (priority && typeof priority !== 'string') {
+  if (priority && typeof priority !== STRING_TYPE) {
     errors.push({ taskPriority: 'Nieprawidłowy format priorytetu zadania' });
   }
 
@@ -139,7 +141,7 @@ export const validateTasksFromCSVInput = (tasks) => {
   tasks.forEach((task) => {
     const taskTrimmedName = task.body.substring(0, 10);
 
-    if (typeof task.body !== 'string') {
+    if (typeof task.body !== STRING_TYPE) {
       errors.push({
         tasksFromCSV: `Zadanie ${taskTrimmedName + '...'} posiada nieprawidłowy format`,
       });
@@ -151,7 +153,7 @@ export const validateTasksFromCSVInput = (tasks) => {
 
     if (
       task.finishDate &&
-      (typeof task.finishDate !== 'string' || isNaN(new Date(task.finishDate).getTime()))
+      (typeof task.finishDate !== STRING_TYPE || isNaN(new Date(task.finishDate).getTime()))
     ) {
       errors.push({
         tasksFromCSV: `Zadanie ${
@@ -160,7 +162,7 @@ export const validateTasksFromCSVInput = (tasks) => {
       });
     }
 
-    if (task.priority && typeof task.priority !== 'string') {
+    if (task.priority && typeof task.priority !== STRING_TYPE) {
       errors.push({
         tasksFromCSV: `Zadanie ${taskTrimmedName + '...'} posiada nieprawidłowy format priorytetu`,
       });

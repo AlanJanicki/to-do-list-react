@@ -18,4 +18,8 @@ mongoose
   .then(({ url }) => {
     console.log(`Servers is running at ${url}`);
   })
-  .catch((err) => console.log(err));
+  .catch((err) => {
+    console.log(err);
+    mongoose.connection.close();
+    process.exit(1);
+  });
