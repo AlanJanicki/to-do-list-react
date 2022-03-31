@@ -6,6 +6,8 @@ import { ClearTasksListFormWrapper, Form, LoadingSpinner } from '../styles/Style
 
 import SuccessInfo from './SuccessInfo';
 
+import { CONFIRM_FORM_ACCOUNT_FORM_TYPE, CONFIRM_FORM_TASKSLIST_FORM_TYPE } from '../Form';
+
 const ConfirmForm = React.forwardRef(
   (
     {
@@ -26,9 +28,9 @@ const ConfirmForm = React.forwardRef(
 
     useEffect(() => {
       if (confirmFormTasksList) {
-        setFormType('confirmFormTasksList');
+        setFormType(CONFIRM_FORM_TASKSLIST_FORM_TYPE);
       } else if (confirmFormAccount) {
-        setFormType('confirmFormAccount');
+        setFormType(CONFIRM_FORM_ACCOUNT_FORM_TYPE);
       }
     }, [confirmFormAccount, confirmFormTasksList, setFormType]);
 

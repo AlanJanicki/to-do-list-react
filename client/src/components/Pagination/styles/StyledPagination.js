@@ -77,7 +77,10 @@ export const TwentyTasks = styled.button`
 `;
 
 export const AllTasks = styled.button`
-  color: ${(props) => (props.tasksPerPage > 20 ? '#4c8077' : '#919191')};
+  color: ${(props) =>
+    props.tasksPerPage !== 10 && props.tasksPerPage !== 15 && props.tasksPerPage !== 20
+      ? '#4c8077'
+      : '#919191'};
 `;
 
 export const Navigate = styled.div`

@@ -7,6 +7,8 @@ import { LoadingSpinner } from '../styles/StyledForm';
 
 import SuccessInfo from './SuccessInfo';
 
+import { PASSWORD_FORM_FORM_TYPE } from '../Form';
+
 const PasswordForm = React.forwardRef(
   (
     {
@@ -28,7 +30,7 @@ const PasswordForm = React.forwardRef(
     const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
 
     useEffect(() => {
-      setFormType('passwordForm');
+      setFormType(PASSWORD_FORM_FORM_TYPE);
     }, [setFormType]);
 
     return (

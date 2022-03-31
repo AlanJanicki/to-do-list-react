@@ -18,6 +18,8 @@ import {
   UploadFile,
 } from '../styles/StyledForm';
 
+import { ADD_TASKS_FROM_CSV_FORM_TYPE, ADD_TASK_FORM_FORM_TYPE, EDIT_TASK_FORM } from '../Form';
+
 const TaskForm = React.forwardRef(
   (
     {
@@ -44,12 +46,12 @@ const TaskForm = React.forwardRef(
 
     useEffect(() => {
       if (addTaskForm) {
-        setFormType('addTaskForm');
+        setFormType(ADD_TASK_FORM_FORM_TYPE);
       } else if (editTaskForm) {
-        setFormType('editTaskForm');
+        setFormType(EDIT_TASK_FORM);
       }
       if (tasksFromCSV.length > 0) {
-        setFormType('addTasksFromCSVForm');
+        setFormType(ADD_TASKS_FROM_CSV_FORM_TYPE);
       }
     }, [addTaskForm, editTaskForm, setFormType, tasksFromCSV]);
 

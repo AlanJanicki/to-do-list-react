@@ -4,6 +4,8 @@ import { useSelector } from 'react-redux';
 
 import { Avatar, AvatarsWrapper, FormParagraph } from '../styles/StyledForm';
 
+import { REGISTER_FORM_FORM_TYPE } from '../Form';
+
 const Avatars = React.forwardRef(({ avatarValue, formType, handleUserInput }, ref) => {
   const isLogoutTimeoutModalOpen = useSelector((state) => state.modal.isLogoutTimeoutModalOpen);
   const user = useSelector((state) => state.auth.user);
@@ -26,7 +28,7 @@ const Avatars = React.forwardRef(({ avatarValue, formType, handleUserInput }, re
               id={i}
               name='avatar'
               type='radio'
-              required={formType === 'registerForm'}
+              required={formType === REGISTER_FORM_FORM_TYPE}
               value={avatarValue}
               ref={ref}
               onChange={(e) => handleUserInput(e)}
@@ -37,7 +39,7 @@ const Avatars = React.forwardRef(({ avatarValue, formType, handleUserInput }, re
               id={i}
               name='avatar'
               type='radio'
-              required={formType === 'registerForm'}
+              required={formType === REGISTER_FORM_FORM_TYPE}
               value={avatarValue}
               onChange={(e) => handleUserInput(e)}
             />

@@ -122,7 +122,8 @@ const Pagination = ({ isOrderUpdatingActive }) => {
       (isOrderUpdatingActive && tasksListPage > 1)
         ? null
         : !tasksListErrors &&
-          tasksAmount > 10 && (
+          tasksAmount > 10 &&
+          tasksFilteredAmount > 0 && (
             <PaginationWrapper>
               <h5>Ilość zadań na stronie</h5>
               <TasksAmount tasksAmount={tasksAmount} tasksPerPage={tasksPerPage}>
@@ -155,9 +156,8 @@ const Pagination = ({ isOrderUpdatingActive }) => {
                   disabled={isModalOpen || isLogoutTimeoutModalOpen}
                   title={'wszystkie'}
                   value={tasksAmount}
-                  tasksAmount={tasksAmount}
                   tasksPerPage={tasksPerPage}
-                  onClick={handleTasksPerPage}>
+                  onClick={(e) => handleTasksPerPage(e)}>
                   <FontAwesomeIcon icon={faInfinity} />
                 </AllTasks>
               </TasksAmount>

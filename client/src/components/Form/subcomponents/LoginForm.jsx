@@ -12,6 +12,8 @@ import {
   Wrapper,
 } from '../styles/StyledForm';
 
+import { LOGIN_FORM_FORM_TYPE, REGISTER_FORM_FORM_TYPE } from '../Form';
+
 const LoginForm = ({
   formErrors,
   formWarnings,
@@ -31,7 +33,7 @@ const LoginForm = ({
 
   useEffect(() => {
     if (!isModalOpen) {
-      setFormType('loginForm');
+      setFormType(LOGIN_FORM_FORM_TYPE);
     }
   }, [isModalOpen, setFormType]);
 
@@ -43,7 +45,7 @@ const LoginForm = ({
 
   const handleOpenRegisterForm = (e) => {
     handleOpenModal(e);
-    setFormType('registerForm');
+    setFormType(REGISTER_FORM_FORM_TYPE);
   };
 
   return (

@@ -40,6 +40,11 @@ import {
 
 import Form from '../Form/Form';
 
+const ADD_TASK_OPTION = 'addTask';
+const CLEAR_TASKSLIST_OPTION = 'clearTasksList';
+const EDIT_TASK_OPTION = 'editTask';
+const REMOVE_TASK_OPTION = 'removeTask';
+
 const ControlPanel = () => {
   const [runFadeOutDisplaySelectAnimation, setRunFadeOutDisplaySelectAnimation] = useState(null);
   const [runFadeOutSortSelectAnimation, setRunFadeOutSortSelectAnimation] = useState(null);
@@ -193,7 +198,7 @@ const ControlPanel = () => {
             loadingDeleteTasks={loadingDeleteTasks}
             tasksList={tasksList}>
             <button
-              data-option='addTask'
+              data-option={ADD_TASK_OPTION}
               disabled={isModalOpen || isLogoutTimeoutModalOpen}
               title={'Dodaj zadanie'}
               onClick={handleSelectOption}>
@@ -201,7 +206,7 @@ const ControlPanel = () => {
               {windowWidth > 660 && <p>Dodaj zadanie</p>}
             </button>
             <button
-              data-option='removeTask'
+              data-option={REMOVE_TASK_OPTION}
               disabled={
                 isModalOpen ||
                 isLogoutTimeoutModalOpen ||
@@ -222,7 +227,7 @@ const ControlPanel = () => {
               )}
             </button>
             <button
-              data-option='editTask'
+              data-option={EDIT_TASK_OPTION}
               disabled={
                 isModalOpen ||
                 isLogoutTimeoutModalOpen ||
@@ -239,7 +244,7 @@ const ControlPanel = () => {
               {windowWidth > 660 && <p>Edytuj zadanie</p>}
             </button>
             <button
-              data-option='confirmFormTasksList'
+              data-option={CLEAR_TASKSLIST_OPTION}
               disabled={isModalOpen || isLogoutTimeoutModalOpen || tasksList.length === 0}
               title={'Wyczyść listę'}
               onClick={handleSelectOption}>
@@ -305,10 +310,10 @@ const ControlPanel = () => {
           </Display>
         </Manage>
       </Wrapper>
-      {selectedOption === 'addTask' && (
+      {selectedOption === ADD_TASK_OPTION && (
         <Form isModalOpenOnInit={true} addTaskForm={true} disableForm={handleUnselectOption} />
       )}
-      {selectedOption === 'editTask' && (
+      {selectedOption === EDIT_TASK_OPTION && (
         <Form
           editTaskData={checkedTasks}
           isModalOpenOnInit={true}
@@ -316,7 +321,7 @@ const ControlPanel = () => {
           disableForm={handleUnselectOption}
         />
       )}
-      {selectedOption === 'confirmFormTasksList' && (
+      {selectedOption === CLEAR_TASKSLIST_OPTION && (
         <Form
           isModalOpenOnInit={true}
           confirmFormTasksList={true}

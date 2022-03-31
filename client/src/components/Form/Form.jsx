@@ -48,6 +48,16 @@ import PasswordForm from './subcomponents/PasswordForm';
 import RegisterForm from './subcomponents/RegisterForm';
 import TaskForm from './subcomponents/TaskForm';
 
+export const ADD_TASK_FORM_FORM_TYPE = 'addTaskForm';
+export const ADD_TASKS_FROM_CSV_FORM_TYPE = 'addTasksFromCSVForm';
+const AVATARS_FORM_FORM_TYPE = 'avatarsForm';
+export const CONFIRM_FORM_ACCOUNT_FORM_TYPE = 'confirmFormAccount';
+export const CONFIRM_FORM_TASKSLIST_FORM_TYPE = 'confirmFormTasksList';
+export const EDIT_TASK_FORM = 'editTaskForm';
+export const LOGIN_FORM_FORM_TYPE = 'loginForm';
+export const PASSWORD_FORM_FORM_TYPE = 'passwordForm';
+export const REGISTER_FORM_FORM_TYPE = 'registerForm';
+
 const Form = ({
   addTaskForm,
   avatarsForm,
@@ -250,12 +260,22 @@ const Form = ({
 
   useEffect(() => {
     if (editTaskData && editTaskData.length > 0) {
-      setFormData((prevState) => ({
-        ...prevState,
+      const editData = {
         taskBody: editTaskData[0].body,
         taskFinishDate: editTaskData[0].finishDate,
         taskPriority: editTaskData[0].priority,
+      };
+
+      setFormData((prevState) => ({
+        ...prevState,
+        ...editData,
       }));
+
+      checkWarningData.current = {
+        ...editData,
+      };
+      const { warnings } = handleValidateInput(checkWarningData.current);
+      handleSetWarnings(warnings);
     }
   }, [editTaskData]);
 
@@ -300,7 +320,7 @@ const Form = ({
     if (disableForm) {
       disableForm();
     }
-    if (formType === 'confirmFormAccount' && formSentSuccessfully) {
+    if (formType === CONFIRM_FORM_ACCOUNT_FORM_TYPE && formSentSuccessfully) {
       dispatch(closeAccountMenu());
       setTimeout(() => {
         dispatch(removeUser());
@@ -312,7 +332,7 @@ const Form = ({
   };
 
   const handleUserInput = (e) => {
-    if (formType !== 'loginForm' && formType !== 'registerForm') {
+    if (formType !== LOGIN_FORM_FORM_TYPE && formType !== REGISTER_FORM_FORM_TYPE) {
       const isUserTokenExpired = checkUserTokenValidity();
       if (isUserTokenExpired) {
         dispatch(setIsUserTokenExpired(isUserTokenExpired));
@@ -350,7 +370,7 @@ const Form = ({
   const handleSubmitForm = (e) => {
     e.preventDefault();
     handleClearFormState([setFormErrors]);
-    if (formType !== 'loginForm' && formType !== 'registerForm') {
+    if (formType !== LOGIN_FORM_FORM_TYPE && formType !== REGISTER_FORM_FORM_TYPE) {
       const isUserTokenExpired = checkUserTokenValidity();
       if (isUserTokenExpired) {
         dispatch(setIsUserTokenExpired(isUserTokenExpired));
@@ -360,9 +380,9 @@ const Form = ({
     const { errors } = handleValidateInput(formData);
     handleSetErrors(errors);
     if (errors.length === 0) {
-      if (formType === 'loginForm') {
+      if (formType === LOGIN_FORM_FORM_TYPE) {
         loginUser({ variables: { login: formData.login, password: formData.password } });
-      } else if (formType === 'registerForm') {
+      } else if (formType === REGISTER_FORM_FORM_TYPE) {
         registerUser({
           variables: {
             input: {
@@ -374,7 +394,7 @@ const Form = ({
             },
           },
         });
-      } else if (formType === 'passwordForm') {
+      } else if (formType === PASSWORD_FORM_FORM_TYPE) {
         updateUserPassword({
           variables: {
             input: {
@@ -384,7 +404,7 @@ const Form = ({
             },
           },
         });
-      } else if (formType === 'avatarsForm') {
+      } else if (formType === AVATARS_FORM_FORM_TYPE) {
         if (!formData.ownAvatar && !formData.avatar) {
           handleSetErrors([
             {
@@ -423,9 +443,9 @@ const Form = ({
             }
           );
         }
-      } else if (formType === 'confirmFormAccount') {
+      } else if (formType === CONFIRM_FORM_ACCOUNT_FORM_TYPE) {
         deleteUser();
-      } else if (formType === 'addTaskForm') {
+      } else if (formType === ADD_TASK_FORM_FORM_TYPE) {
         addTask({
           variables: {
             input: {
@@ -436,13 +456,13 @@ const Form = ({
             },
           },
         });
-      } else if (formType === 'addTasksFromCSVForm') {
+      } else if (formType === ADD_TASKS_FROM_CSV_FORM_TYPE) {
         addTasksFromCSV({
           variables: {
             input: formData.tasksFromCSV,
           },
         });
-      } else if (formType === 'editTaskForm') {
+      } else if (formType === EDIT_TASK_FORM) {
         editTask({
           variables: {
             input: {
@@ -453,7 +473,7 @@ const Form = ({
             taskId: editTaskData[0].id,
           },
         });
-      } else if (formType === 'confirmFormTasksList') {
+      } else if (formType === CONFIRM_FORM_TASKSLIST_FORM_TYPE) {
         deleteAllTasks();
       }
     }
@@ -465,7 +485,7 @@ const Form = ({
   const handleFormSent = () => {
     let shouldCloseModal = handleCloseModalOnSubmitForm();
     setFormSentSuccessfully(true);
-    if (formType !== 'confirmFormAccount') {
+    if (formType !== CONFIRM_FORM_ACCOUNT_FORM_TYPE) {
       handleClearFormState([setFormData, setFormErrors, setFormWarnings]);
     }
     checkWarningData.current = initFormDataState;
@@ -538,10 +558,10 @@ const Form = ({
 
   const handleCloseModalOnSubmitForm = () => {
     if (
-      formType === 'passwordForm' ||
-      formType === 'registerForm' ||
-      formType === 'avatarsForm' ||
-      formType === 'confirmFormAccount'
+      formType === PASSWORD_FORM_FORM_TYPE ||
+      formType === REGISTER_FORM_FORM_TYPE ||
+      formType === AVATARS_FORM_FORM_TYPE ||
+      formType === CONFIRM_FORM_ACCOUNT_FORM_TYPE
     ) {
       return false;
     } else {
