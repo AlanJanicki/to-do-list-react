@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -87,20 +87,6 @@ const TasksList = () => {
       if (isOrderUpdatingActive) {
         setIsOrderUpdatingActive(false);
       }
-
-      dispatch(setTasksAmount(data.getTasks.tasksAmount));
-      dispatch(setTasksFilteredAmount(data.getTasks.tasksFilteredAmount));
-      dispatch(setTasksList(data.getTasks.tasks));
-
-      if (tasksListPage > Math.ceil(data.getTasks.tasksFilteredAmount / tasksPerPage)) {
-        dispatch(
-          setTasksListPage(Math.max(1, Math.ceil(data.getTasks.tasksFilteredAmount / tasksPerPage)))
-        );
-      }
-
-      if (tasksPerPage > 20) {
-        dispatch(setTasksPerPage(data.getTasks.tasksAmount));
-      }
     },
   });
 
@@ -121,6 +107,24 @@ const TasksList = () => {
       }
     },
   });
+
+  useEffect(() => {
+    if (data) {
+      dispatch(setTasksAmount(data.getTasks.tasksAmount));
+      dispatch(setTasksFilteredAmount(data.getTasks.tasksFilteredAmount));
+      dispatch(setTasksList(data.getTasks.tasks));
+
+      if (tasksListPage > Math.ceil(data.getTasks.tasksFilteredAmount / tasksPerPage)) {
+        dispatch(
+          setTasksListPage(Math.max(1, Math.ceil(data.getTasks.tasksFilteredAmount / tasksPerPage)))
+        );
+      }
+
+      if (tasksPerPage > 20) {
+        dispatch(setTasksPerPage(data.getTasks.tasksAmount));
+      }
+    }
+  }, [data, dispatch, tasksListPage, tasksPerPage]);
 
   const handleDragEnd = (result) => {
     if (!result.destination || result.destination.index === result.source.index) {
