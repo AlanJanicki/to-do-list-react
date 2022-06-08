@@ -350,7 +350,7 @@ const Form = ({
         setFormData({ ...formData, [name]: value });
         checkWarningData.current = { ...formData, [name]: value };
       }
-    } else if (e.type === 'image/jpeg') {
+    } else if (e.type === 'image/jpeg' || e.type === 'image/png') {
       setFormData({ ...formData, avatar: '', ownAvatar: e });
     } else {
       setFormData({
